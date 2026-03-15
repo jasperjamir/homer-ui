@@ -110,7 +110,7 @@ export function getImageJourneySteps(context: {
       href: ROUTES.IMAGE_GENERATIONS_NEW,
     },
     {
-      circleLabel: "2.1",
+      circleLabel: "2",
       shortLabel: "VALIDATE",
       description: "",
       context: "",
