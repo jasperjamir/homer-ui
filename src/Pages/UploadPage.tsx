@@ -22,8 +22,9 @@ import {
 } from "@/Shared/components/ui/table";
 import { getImageGenerationsQueryOptions } from "@/Features/ImageGenerations/query-options";
 import { getUploadPlatformsQueryOptions } from "@/Features/UploadPlatforms/query-options";
+import { getPlatformTypesQueryOptions } from "@/Features/PlatformTypes/query-options";
 import type { PoolAsset } from "@/Features/Upload/models";
-import { getAssetsInRange } from "@/Features/Upload/services";
+import { getAssetsInRange, uploadSelectedAssets } from "@/Features/Upload/services";
 
 const TIME_FILTER_OPTIONS = [
   { value: "hour", label: "Last hour", since: () => new Date(Date.now() - 60 * 60 * 1000) },
@@ -72,11 +73,13 @@ export default function UploadPage() {
     }
   };
 
+  const [uploading, setUploading] = useState(false);
   const { data: imageGenerations = [] } = useQuery(getImageGenerationsQueryOptions());
   const { data: assets = [], isLoading: assetsLoading } = useAssetsQuery(filterValue);
   const { data: platforms = [], isLoading: platformsLoading } = useQuery(
     getUploadPlatformsQueryOptions()
   );
+  const { data: platformTypes = [] } = useQuery(getPlatformTypesQueryOptions());
 
   const isGenerationFilter = filterValue && !TIME_FILTER_OPTIONS.some((o) => o.value === filterValue);
 
@@ -90,9 +93,36 @@ export default function UploadPage() {
     });
   };
 
-  const handleUpload = () => {
-    const count = checked.size;
-    toast.success(`Finished uploading ${count} item${count === 1 ? "" : "s"} to your platforms`);
+  const handleUpload = async () => {
+    if (platformTypes.length === 0 || platforms.length === 0) {
+      toast.error("Platforms or platform types not loaded");
+      return;
+    }
+    setUploading(true);
+    try {
+      const result = await uploadSelectedAssets(
+        assets,
+        platforms,
+        platformTypes,
+        checked,
+      );
+      const total = result.success + result.failed;
+      if (result.failed === 0) {
+        toast.success(
+          `Finished uploading ${result.success} item${result.success === 1 ? "" : "s"} to your platforms`,
+        );
+      } else if (result.success > 0) {
+        toast.warning(
+          `Uploaded ${result.success} of ${total}; ${result.failed} failed. ${result.errors.slice(0, 2).join(" ")}`,
+        );
+      } else {
+        toast.error(result.errors[0] ?? "Upload failed");
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -104,7 +134,7 @@ export default function UploadPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Step 1: Choose assets and platforms</CardTitle>
+          <CardTitle>Step 2: Upload assets to chosen platforms</CardTitle>
           <div className="flex items-center gap-4 pt-2 flex-wrap">
             <Select value={filterValue} onValueChange={handleFilterChange}>
               <SelectTrigger className="w-[220px]">
@@ -190,8 +220,11 @@ export default function UploadPage() {
           )}
           {assets.length > 0 && (
             <div className="mt-4">
-              <Button onClick={handleUpload} disabled={checked.size === 0}>
-                Upload
+              <Button
+                onClick={handleUpload}
+                disabled={checked.size === 0 || uploading}
+              >
+                {uploading ? "Uploading…" : "Upload"}
               </Button>
             </div>
           )}

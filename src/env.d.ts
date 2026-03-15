@@ -19,6 +19,7 @@ declare global {
     readonly PUBLIC_PATIENT_PORTAL_URL: string;
     readonly PUBLIC_SUPABASE_URL: string;
     readonly PUBLIC_SUPABASE_ANON_KEY: string;
+    readonly PUBLIC_AYRSHARE_API_KEY: string;
     readonly PUBLIC_DEV_BYPASS_AUTH?: string;
   }
 }
