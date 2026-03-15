@@ -1,23 +1,32 @@
 export interface ImageGeneration {
   id: string;
   context: string;
-  project_id: string | null;
-  marketing_prompt_id: string | null;
-  platform_type_id: string | null;
-  asset_count: number;
-  created_at: string;
-  updated_at: string;
+  projectId: string | null;
+  marketingPromptId: string | null;
+  platformType: PlatformType | null;
+  assetCount: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ImageGenerationAsset {
   id: string;
-  image_generation_id: string;
+  imageGenerationId: string;
   index: number;
-  asset_url: string | null;
-  created_at: string;
+  assetUrl: string | null;
+  createdAt: string;
 }
 
 export type ImageGenerationInsert = Omit<
   ImageGeneration,
-  "id" | "created_at" | "updated_at"
+  "id" | "createdAt" | "updatedAt"
 >;
+
+/** API request payload for POST /generate-image */
+export interface CreateImageGenerationRequest {
+  marketingPromptId: string | null;
+  projectId: string | null;
+  context: string;
+  platformType: PlatformType | null;
+  assetCount: number;
+}

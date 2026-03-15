@@ -4,13 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Shared/components/ui
 import { GenerationForm } from "@/Features/ImageGenerations/components";
 import { useCreateImageGenerationMutation } from "@/Features/ImageGenerations/query-options";
 import type { GenerationFormData } from "@/Features/ImageGenerations/schemas";
-import { ROUTES, imageGenerationDetail } from "@/Shared/utils/routes.util";
+import { imageGenerationDetail } from "@/Shared/utils/routes.util";
 
 export default function ImageGenerationNewPage() {
   const navigate = useNavigate();
   const createMutation = useCreateImageGenerationMutation({
     onSuccess: (id) => {
-      toast.success("Image links generated (mock)");
+      toast.success("Image generation created");
       navigate(imageGenerationDetail(id));
     },
     onError: (e) => toast.error(e.message),
@@ -18,11 +18,11 @@ export default function ImageGenerationNewPage() {
 
   const handleSubmit = (data: GenerationFormData) => {
     createMutation.mutate({
+      marketingPromptId: data.marketingPromptId ?? null,
+      projectId: data.projectId ?? null,
       context: data.context,
-      project_id: data.project_id ?? null,
-      marketing_prompt_id: data.marketing_prompt_id ?? null,
-      platform_type_id: data.platform_type_id ?? null,
-      asset_count: data.asset_count,
+      platformType: data.platformType ?? null,
+      assetCount: data.assetCount,
     });
   };
 
@@ -30,16 +30,16 @@ export default function ImageGenerationNewPage() {
     <div className="p-6 max-w-2xl">
       <Card>
         <CardHeader>
-          <CardTitle>Step 1: Generate image links</CardTitle>
+          <CardTitle>Step 1: Generate images</CardTitle>
           <p className="text-muted-foreground text-sm">
-            Submit to create a generation with mock image URLs. Replace with real API later.
+            Submit to create an image generation via the API.
           </p>
         </CardHeader>
         <CardContent>
           <GenerationForm
             onSubmit={handleSubmit}
             isLoading={createMutation.isPending}
-            submitLabel="Generate image links"
+            submitLabel="Generate images"
           />
         </CardContent>
       </Card>

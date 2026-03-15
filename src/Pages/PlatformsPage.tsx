@@ -67,7 +67,7 @@ export default function PlatformsPage() {
 
   const form = useForm<UploadPlatformFormData>({
     resolver: zodResolver(uploadPlatformSchema),
-    defaultValues: { name: "", platform_type_id: defaultPlatformTypeId },
+    defaultValues: { name: "", platform_type: PlatformType.INSTAGRAM },
   });
 
   const createMutation = useCreateUploadPlatformMutation({

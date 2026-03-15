@@ -1,7 +1,7 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { ImageGenerationInsert } from "@/Features/ImageGenerations/models";
+import type { CreateImageGenerationRequest } from "@/Features/ImageGenerations/models";
 import {
-  createImageGenerationWithMockLinks,
+  createImageGeneration,
   deleteImageGeneration,
   getImageGenerationAssets,
   getImageGenerationById,
@@ -34,16 +34,18 @@ export function getImageGenerationAssetsQueryOptions(imageGenerationId: string) 
 
 export function useCreateImageGenerationMutation(options?: {
   onSuccess?: (id: string) => void;
+  onError?: (error: Error) => void;
 }) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: ImageGenerationInsert) => createImageGenerationWithMockLinks(input),
+    mutationFn: (input: CreateImageGenerationRequest) => createImageGeneration(input),
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ["image-generations"] });
       qc.invalidateQueries({ queryKey: ["image-generation", data.id] });
       qc.invalidateQueries({ queryKey: ["image-generation-assets", data.id] });
       options?.onSuccess?.(data.id);
     },
+    onError: options?.onError,
   });
 }
 

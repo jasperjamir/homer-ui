@@ -54,9 +54,9 @@ export default function ImageGenerationsPage() {
               generations.map((g) => (
                 <TableRow key={g.id}>
                   <TableCell className="max-w-md truncate">{g.context}</TableCell>
-                  <TableCell>{g.asset_count}</TableCell>
+                  <TableCell>{g.assetCount}</TableCell>
                   <TableCell className="text-muted-foreground text-sm">
-                    {new Date(g.created_at).toLocaleString()}
+                    {new Date(g.createdAt).toLocaleString()}
                   </TableCell>
                   <TableCell>
                     <Button variant="ghost" size="sm" asChild>

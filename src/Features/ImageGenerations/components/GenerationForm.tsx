@@ -39,10 +39,10 @@ export function GenerationForm({
     resolver: zodResolver(generationFormSchema),
     defaultValues: {
       context: "",
-      project_id: null,
-      marketing_prompt_id: null,
-      platform_type_id: null,
-      asset_count: 5,
+      projectId: null,
+      marketingPromptId: null,
+      platformType: null,
+      assetCount: 5,
       ...defaultValues,
     },
   });
@@ -62,8 +62,8 @@ export function GenerationForm({
       <Field>
         <FieldLabel>Project</FieldLabel>
         <Select
-          value={form.watch("project_id") ?? ""}
-          onValueChange={(v) => form.setValue("project_id", v || null)}
+          value={form.watch("projectId") ?? ""}
+          onValueChange={(v) => form.setValue("projectId", v || null)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select project" />
@@ -80,8 +80,8 @@ export function GenerationForm({
       <Field>
         <FieldLabel>Marketing prompt</FieldLabel>
         <Select
-          value={form.watch("marketing_prompt_id") ?? ""}
-          onValueChange={(v) => form.setValue("marketing_prompt_id", v || null)}
+          value={form.watch("marketingPromptId") ?? ""}
+          onValueChange={(v) => form.setValue("marketingPromptId", v || null)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select marketing prompt" />
@@ -119,9 +119,9 @@ export function GenerationForm({
           type="number"
           min={1}
           max={10}
-          {...form.register("asset_count", { valueAsNumber: true })}
+          {...form.register("assetCount", { valueAsNumber: true })}
         />
-        <FieldError errors={form.formState.errors.asset_count ? [form.formState.errors.asset_count] : undefined} />
+        <FieldError errors={form.formState.errors.assetCount ? [form.formState.errors.assetCount] : undefined} />
       </Field>
       <Button type="submit" disabled={isLoading}>
         {isLoading ? "Creating…" : submitLabel}

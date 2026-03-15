@@ -1,13 +1,32 @@
 import type {
+  CreateImageGenerationRequest,
   ImageGeneration,
   ImageGenerationAsset,
-  ImageGenerationInsert,
 } from "@/Features/ImageGenerations/models";
+import { api } from "@/Shared/services/api";
 import { supabase } from "@/Shared/lib/supabase";
 
-/** Mock image URL for MVP - replace with real API later */
-function getMockImageUrl(generationId: string, index: number): string {
-  return `https://picsum.photos/seed/${generationId}-${index}/400/400`;
+function toImageGeneration(row: Record<string, unknown>): ImageGeneration {
+  return {
+    id: row.id as string,
+    context: row.context as string,
+    projectId: row.project_id as string | null,
+    marketingPromptId: row.marketing_prompt_id as string | null,
+    platformType: row.platform_type as ImageGeneration["platformType"],
+    assetCount: row.asset_count as number,
+    createdAt: row.created_at as string,
+    updatedAt: row.updated_at as string,
+  };
+}
+
+function toImageGenerationAsset(row: Record<string, unknown>): ImageGenerationAsset {
+  return {
+    id: row.id as string,
+    imageGenerationId: row.image_generation_id as string,
+    index: row.index as number,
+    assetUrl: row.asset_url as string | null,
+    createdAt: row.created_at as string,
+  };
 }
 
 export async function getImageGenerations(): Promise<ImageGeneration[]> {
@@ -16,7 +35,7 @@ export async function getImageGenerations(): Promise<ImageGeneration[]> {
     .select("*")
     .order("created_at", { ascending: false });
   if (error) throw error;
-  return data as ImageGeneration[];
+  return (data ?? []).map(toImageGeneration);
 }
 
 export async function getImageGenerationById(id: string): Promise<ImageGeneration | null> {
@@ -29,7 +48,7 @@ export async function getImageGenerationById(id: string): Promise<ImageGeneratio
     if (error.code === "PGRST116") return null;
     throw error;
   }
-  return data as ImageGeneration;
+  return data ? toImageGeneration(data) : null;
 }
 
 export async function getImageGenerationAssets(
@@ -41,39 +60,14 @@ export async function getImageGenerationAssets(
     .eq("image_generation_id", imageGenerationId)
     .order("index", { ascending: true });
   if (error) throw error;
-  return data as ImageGenerationAsset[];
+  return (data ?? []).map(toImageGenerationAsset);
 }
 
-export async function createImageGenerationWithMockLinks(
-  input: ImageGenerationInsert,
+export async function createImageGeneration(
+  input: CreateImageGenerationRequest,
 ): Promise<ImageGeneration> {
-  const assetCount = Math.min(10, Math.max(1, input.asset_count));
-  const { data: gen, error: genError } = await supabase
-    .from("image_generations")
-    .insert({
-      context: input.context,
-      project_id: input.project_id ?? null,
-      marketing_prompt_id: input.marketing_prompt_id ?? null,
-      platform_type_id: input.platform_type_id ?? null,
-      asset_count: assetCount,
-      updated_at: new Date().toISOString(),
-    })
-    .select()
-    .single();
-  if (genError) throw genError;
-  const generation = gen as ImageGeneration;
-
-  const assets = Array.from({ length: assetCount }, (_, i) => ({
-    image_generation_id: generation.id,
-    index: i + 1,
-    asset_url: getMockImageUrl(generation.id, i + 1),
-  }));
-  const { error: assetsError } = await supabase
-    .from("image_generation_assets")
-    .insert(assets);
-  if (assetsError) throw assetsError;
-
-  return generation;
+  const { data } = await api.post<ImageGeneration>("/generate-image", input);
+  return data;
 }
 
 export async function deleteImageGeneration(id: string): Promise<void> {
