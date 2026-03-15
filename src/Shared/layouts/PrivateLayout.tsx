@@ -13,7 +13,7 @@ import {
 } from "@/Shared/components/ui/breadcrumb";
 import { Separator } from "@/Shared/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/Shared/components/ui/sidebar";
-import { useAuth, ViewModeProvider } from "@/Shared/contexts";
+import { useAuth } from "@/Shared/contexts";
 import { useBreadcrumbs } from "@/Shared/hooks/use-breadcrumbs";
 import { ROUTES } from "@/Shared/utils";
 
@@ -35,11 +35,7 @@ export default function PrivateLayout() {
     return null;
   }
 
-  return (
-    <ViewModeProvider>
-      <PrivateLayoutContent />
-    </ViewModeProvider>
-  );
+  return <PrivateLayoutContent />;
 }
 
 function PrivateLayoutContent() {

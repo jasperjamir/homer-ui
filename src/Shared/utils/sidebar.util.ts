@@ -48,12 +48,6 @@ const SIDEBAR_ITEMS: SidebarConfig[] = [
 
 export const SIDEBAR_CONFIG: SidebarConfig[] = SIDEBAR_ITEMS;
 
-export type GetSidebarNavItemsOptions = {
-  isEducator: boolean;
-  isStudent: boolean;
-  viewAsStudent?: boolean;
-};
-
-export function getSidebarNavItems(_options: GetSidebarNavItemsOptions): SidebarConfig[] {
+export function getSidebarNavItems(): SidebarConfig[] {
   return SIDEBAR_ITEMS;
 }

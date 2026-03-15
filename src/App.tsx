@@ -1,7 +1,7 @@
 import "./App.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/Shared/components/ui/sonner";
-import { AuthProvider, SupabaseAppUserProvider } from "./Shared/contexts";
+import { AuthProvider } from "./Shared/contexts";
 import { AppRoutes } from "./Shared/routes/AppRoutes";
 
 const queryClient = new QueryClient();
@@ -11,9 +11,7 @@ const App = () => {
     <div className="content">
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <SupabaseAppUserProvider>
-            <AppRoutes />
-          </SupabaseAppUserProvider>
+          <AppRoutes />
         </AuthProvider>
       </QueryClientProvider>
       <Toaster />
