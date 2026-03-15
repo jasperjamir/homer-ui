@@ -21,7 +21,7 @@ export default function VideoGenerationNewPage() {
       context: data.context,
       project_id: data.project_id ?? null,
       marketing_prompt_id: data.marketing_prompt_id ?? null,
-      platform_type: data.platform_type ?? null,
+      platform_type_id: data.platform_type_id ?? null,
       asset_count: data.asset_count,
     });
   };

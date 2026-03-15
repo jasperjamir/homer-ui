@@ -86,7 +86,7 @@ export async function createVideoGenerationWithMockStoryboard(
       context: input.context,
       project_id: input.project_id ?? null,
       marketing_prompt_id: input.marketing_prompt_id ?? null,
-      platform_type: input.platform_type ?? null,
+      platform_type_id: input.platform_type_id ?? null,
       asset_count: assetCount,
       updated_at: new Date().toISOString(),
     })

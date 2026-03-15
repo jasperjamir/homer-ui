@@ -1,11 +1,9 @@
-import type { PlatformType } from "@/Shared/models";
-
 export interface VideoGeneration {
   id: string;
   context: string;
   project_id: string | null;
   marketing_prompt_id: string | null;
-  platform_type: PlatformType | null;
+  platform_type_id: string | null;
   asset_count: number;
   created_at: string;
   updated_at: string;

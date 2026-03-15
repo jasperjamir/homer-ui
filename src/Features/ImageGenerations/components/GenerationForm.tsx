@@ -13,11 +13,11 @@ import {
 } from "@/Shared/components/ui/select";
 import { Textarea } from "@/Shared/components/ui/textarea";
 import { getMarketingPromptsQueryOptions } from "@/Features/MarketingPrompts/query-options";
+import { getPlatformTypesQueryOptions } from "@/Features/PlatformTypes/query-options";
 import { getProjectsQueryOptions } from "@/Features/Projects/query-options";
 import { getUploadPlatformsQueryOptions } from "@/Features/UploadPlatforms/query-options";
 import type { GenerationFormData } from "@/Features/ImageGenerations/schemas";
 import { generationFormSchema } from "@/Features/ImageGenerations/schemas";
-import { PlatformType } from "@/Shared/models";
 
 interface GenerationFormProps {
   defaultValues?: Partial<GenerationFormData>;
@@ -34,6 +34,7 @@ export function GenerationForm({
 }: GenerationFormProps) {
   const { data: projects = [] } = useQuery(getProjectsQueryOptions());
   const { data: marketingPrompts = [] } = useQuery(getMarketingPromptsQueryOptions());
+  const { data: platformTypes = [] } = useQuery(getPlatformTypesQueryOptions());
   const { data: platforms = [] } = useQuery(getUploadPlatformsQueryOptions());
 
   const form = useForm<GenerationFormData>({
@@ -42,7 +43,7 @@ export function GenerationForm({
       context: "",
       project_id: null,
       marketing_prompt_id: null,
-      platform_type: null,
+      platform_type_id: null,
       asset_count: 5,
       ...defaultValues,
     },
@@ -99,15 +100,18 @@ export function GenerationForm({
       <Field>
         <FieldLabel>Platform type</FieldLabel>
         <Select
-          value={form.watch("platform_type") ?? ""}
-          onValueChange={(v) => form.setValue("platform_type", (v as PlatformType) || null)}
+          value={form.watch("platform_type_id") ?? ""}
+          onValueChange={(v) => form.setValue("platform_type_id", v || null)}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Instagram or TikTok" />
+            <SelectValue placeholder="Select platform type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={PlatformType.INSTAGRAM}>Instagram</SelectItem>
-            <SelectItem value={PlatformType.TIKTOK}>TikTok</SelectItem>
+            {platformTypes.map((t) => (
+              <SelectItem key={t.id} value={t.id}>
+                {t.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </Field>

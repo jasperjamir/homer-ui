@@ -1,4 +1,3 @@
-export * from "./platform.type";
 export * from "./rule.type";
 export * from "./role.type";
 export * from "./profile.type";
