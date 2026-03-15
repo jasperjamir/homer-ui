@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "react-router";
 import { MediaPreviewDialog } from "@/Shared/components/MediaPreviewDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Shared/components/ui/card";
+import { Separator } from "@/Shared/components/ui/separator";
 import { Button } from "@/Shared/components/ui/button";
 import { Skeleton } from "@/Shared/components/ui/skeleton";
 import { ArrowLeft, VideoOff } from "lucide-react";
@@ -74,12 +75,20 @@ export default function VideoGenerationDetailPage() {
               <Badge variant="outline">{VIDEO_MODEL_LABELS[generation.model]}</Badge>
             )}
           </div>
-          <p className="text-muted-foreground text-sm mt-2">{steps[2].description}</p>
-          {steps[2].context && (
-            <p className="text-muted-foreground text-sm mt-2">{steps[2].context}</p>
-          )}
-          <p className="text-muted-foreground text-sm mt-2">{generation.context}</p>
         </CardHeader>
+        {(steps[2].context || generation.context) && (
+          <>
+            <Separator />
+            <CardContent className="pt-4 space-y-2">
+              {steps[2].context && (
+                <p className="text-muted-foreground text-sm">{steps[2].context}</p>
+              )}
+              {generation.context && (
+                <p className="text-muted-foreground text-sm">{generation.context}</p>
+              )}
+            </CardContent>
+          </>
+        )}
       </Card>
       <Card>
         <CardHeader>

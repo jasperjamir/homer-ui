@@ -91,14 +91,11 @@ export function JourneyStepper({ steps, currentStepIndex, className = "" }: Jour
 const IDEATE_DESCRIPTION =
   "Provide the AI with the context it needs to create strong content.";
 
-const VALIDATE_DESCRIPTION =
-  "Review the AI output before publishing.";
-
 const VALIDATE_CONTEXT =
-  "Ensure the message is clear, the visual is easy to understand, and the content matches your brand and marketing goal. Check if the hook is strong and if the design or video will stop users from scrolling. For images, validate layout, text readability, and CTA visibility. For videos, review the storyboard and generated clips, then edit or regenerate if needed.";
+  "Ensure the message is clear, the visual is easy to understand, and the content matches your brand.";
 
 const LAUNCH_DESCRIPTION =
-  "Once the content is approved, publish it to your chosen platform. Upload the final image or video, add captions if needed, and post or schedule it for release. This step distributes your content to platforms like Instagram or TikTok so your audience can see it. The goal is simple: turn validated creative into live content and get it in front of people. 🚀";
+  "Publish it to your chosen platform. 🚀";
 
 /** Image journey: (1) IDEATE → (2.1) VALIDATE → (3) LAUNCH */
 export function getImageJourneySteps(context: {
@@ -115,7 +112,7 @@ export function getImageJourneySteps(context: {
     {
       circleLabel: "2.1",
       shortLabel: "VALIDATE",
-      description: VALIDATE_DESCRIPTION,
+      description: "",
       context: VALIDATE_CONTEXT,
       href: imageGenerationId ? imageGenerationDetail(imageGenerationId) : ROUTES.IMAGE_GENERATIONS,
     },
@@ -143,14 +140,14 @@ export function getVideoJourneySteps(context: {
     {
       circleLabel: "2.1",
       shortLabel: "VALIDATE",
-      description: VALIDATE_DESCRIPTION,
+      description: "",
       context: VALIDATE_CONTEXT,
       href: videoGenerationId ? videoGenerationStoryboard(videoGenerationId) : ROUTES.VIDEO_GENERATIONS,
     },
     {
       circleLabel: "2.2",
       shortLabel: "VALIDATE",
-      description: VALIDATE_DESCRIPTION,
+      description: "",
       context: VALIDATE_CONTEXT,
       href: videoGenerationId ? videoGenerationDetail(videoGenerationId) : ROUTES.VIDEO_GENERATIONS,
     },

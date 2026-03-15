@@ -32,7 +32,7 @@ export default function VideoGenerationsPage() {
         <Button asChild>
           <Link to={ROUTES.VIDEO_GENERATIONS_NEW}>
             <Plus className="mr-2 h-4 w-4" />
-            Create storyboard
+            Generate Videos
           </Link>
         </Button>
       </div>

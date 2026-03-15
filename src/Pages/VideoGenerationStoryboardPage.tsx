@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Shared/components/ui/card";
+import { Separator } from "@/Shared/components/ui/separator";
 import { Button } from "@/Shared/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import {
@@ -102,16 +103,20 @@ export default function VideoGenerationStoryboardPage() {
       <Card>
         <CardHeader>
           <CardTitle>VALIDATE (2.1) — Storyboard</CardTitle>
-          <p className="text-muted-foreground text-sm mt-1">{steps[1].description}</p>
-          {steps[1].context && (
-            <p className="text-muted-foreground text-sm mt-2">{steps[1].context}</p>
-          )}
           <p className="text-muted-foreground text-sm mt-2">
             {hasGeneratedVideo
               ? "Video has been generated from this storyboard. The storyboard is read-only."
               : "Edit each frame below, then click Save storyboard and generate video."}
           </p>
         </CardHeader>
+        {steps[1].context && (
+          <>
+            <Separator />
+            <CardContent className="pt-4">
+              <p className="text-muted-foreground text-sm">{steps[1].context}</p>
+            </CardContent>
+          </>
+        )}
         <CardContent className="space-y-4">
           {sbLoading || !storyboard ? (
             <div className="flex min-h-[200px] flex-col items-center justify-center gap-2 text-muted-foreground">

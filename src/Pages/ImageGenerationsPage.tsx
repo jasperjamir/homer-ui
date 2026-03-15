@@ -32,7 +32,7 @@ export default function ImageGenerationsPage() {
         <Button asChild>
           <Link to={ROUTES.IMAGE_GENERATIONS_NEW}>
             <Plus className="mr-2 h-4 w-4" />
-            Generate image links
+            Generate images
           </Link>
         </Button>
       </div>
