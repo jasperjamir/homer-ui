@@ -155,7 +155,6 @@ export default function UploadPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Step 3: Upload to platforms</CardTitle>
           <div className="flex items-center gap-4 pt-2 flex-wrap">
             <Select value={filterValue} onValueChange={handleFilterChange}>
               <SelectTrigger className="w-[220px]">
