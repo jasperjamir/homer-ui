@@ -10,6 +10,24 @@ import {
 import { ImageIcon, Video, Settings2, ChevronRight } from "lucide-react";
 import { ROUTES } from "@/Shared/utils/routes.util";
 
+const PROCESS_STEPS = [
+  {
+    label: "IDEATE",
+    number: "1",
+    description: "Provide the AI with the context it needs to create strong content.",
+  },
+  {
+    label: "VALIDATE",
+    number: "2",
+    description: "Review the AI output before publishing. Ensure the message is clear and matches your brand.",
+  },
+  {
+    label: "LAUNCH",
+    number: "3",
+    description: "Publish it to your chosen platform. 🚀",
+  },
+] as const;
+
 const GENERATE_OPTIONS = [
   {
     to: ROUTES.IMAGE_GENERATIONS_NEW,
@@ -54,6 +72,34 @@ export default function HomePage() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <h2 className="text-lg font-semibold">Three-step process</h2>
+          <p className="text-muted-foreground text-sm mt-0.5">
+            IDEATE → VALIDATE → LAUNCH. Start below by creating images or videos.
+          </p>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-4">
+            {PROCESS_STEPS.map((step) => (
+              <div key={step.label} className="flex items-start gap-3">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-primary bg-primary/10 text-sm font-semibold text-primary">
+                  {step.number}
+                </div>
+                <div className="min-w-0 flex-1 space-y-0.5">
+                  <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+                    {step.label}
+                  </p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {step.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 sm:grid-cols-2">
         {GENERATE_OPTIONS.map(({ to, title, description, icon: Icon }) => (
