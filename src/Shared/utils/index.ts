@@ -1,5 +1,4 @@
 export * from "./date.util";
-export * from "./person.util";
 export * from "./routes.util";
 export * from "./rules.util";
 export * from "./sidebar.util";
