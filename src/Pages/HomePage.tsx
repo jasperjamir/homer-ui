@@ -30,16 +30,16 @@ const PROCESS_STEPS = [
 
 const GENERATE_OPTIONS = [
   {
-    to: ROUTES.IMAGE_GENERATIONS_NEW,
-    title: "Generate Image",
-    description: "Create new images with the prompt builder. Pick a project and marketing prompt, then generate.",
-    icon: ImageIcon,
-  },
-  {
     to: ROUTES.VIDEO_GENERATIONS_NEW,
     title: "Generate Video",
     description: "Create video storyboards and generate clips. Build frames, set duration, and export.",
     icon: Video,
+  },
+  {
+    to: ROUTES.IMAGE_GENERATIONS_NEW,
+    title: "Generate Image",
+    description: "Create new images with the prompt builder. Pick a project and marketing prompt, then generate.",
+    icon: ImageIcon,
   },
 ] as const;
 
@@ -76,13 +76,13 @@ export default function HomePage() {
       <div className="grid gap-6 sm:grid-cols-2">
         {GENERATE_OPTIONS.map(({ to, title, description, icon: Icon }) => (
           <Link key={to} to={to} className="block group">
-            <Card className="h-full cursor-pointer transition-all hover:shadow-lg hover:border-primary/50 hover:bg-accent/50 active:scale-[0.99]">
+            <Card className="h-full cursor-pointer border-2 border-primary/20 transition-all hover:shadow-lg hover:border-primary/50 hover:bg-accent/50 active:scale-[0.99] focus-visible:outline focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between gap-2">
                   <div className="rounded-lg bg-primary/10 p-3 group-hover:bg-primary/20 transition-colors">
                     <Icon className="h-10 w-10 sm:h-14 sm:w-14 text-primary" />
                   </div>
-                  <ChevronRight className="h-6 w-6 shrink-0 text-accent-blue/90 group-hover:text-accent-blue transition-all" />
+                  <ChevronRight className="h-6 w-6 shrink-0 text-muted-foreground group-hover:text-primary transition-all" />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-semibold mt-2 group-hover:text-primary transition-colors">
                   {title}
@@ -96,7 +96,7 @@ export default function HomePage() {
         ))}
       </div>
 
-      <Card>
+      <Card className="bg-muted/20 cursor-default">
         <CardHeader className="pb-2">
           <h2 className="text-lg font-semibold">Generate assets using the three-step process</h2>
           <p className="text-muted-foreground text-sm mt-0.5">
