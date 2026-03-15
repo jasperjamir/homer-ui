@@ -158,7 +158,7 @@ export default function MarketingPromptsPage() {
             </Field>
             <Field>
               <FieldLabel>Prompt text (optional)</FieldLabel>
-              <Textarea {...form.register("prompt_text")} rows={3} className="resize-none" />
+              <Textarea {...form.register("prompt_text")} rows={3} className="resize-none max-h-48 overflow-y-auto" />
             </Field>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>
@@ -194,7 +194,7 @@ export default function MarketingPromptsPage() {
               </Field>
               <Field>
                 <FieldLabel>Prompt text (optional)</FieldLabel>
-                <Textarea {...form.register("prompt_text")} rows={3} className="resize-none" />
+                <Textarea {...form.register("prompt_text")} rows={3} className="resize-none max-h-48 overflow-y-auto" />
               </Field>
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setEditing(null)}>

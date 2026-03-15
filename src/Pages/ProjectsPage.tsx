@@ -165,7 +165,7 @@ export default function ProjectsPage() {
             </Field>
             <Field>
               <FieldLabel>Prompt text</FieldLabel>
-              <Textarea {...form.register("prompt_text")} rows={3} className="resize-none" placeholder="Optional project-level prompt" />
+              <Textarea {...form.register("prompt_text")} rows={3} className="resize-none max-h-48 overflow-y-auto" placeholder="Optional project-level prompt" />
               <FieldError errors={form.formState.errors.prompt_text ? [form.formState.errors.prompt_text] : undefined} />
             </Field>
             <DialogFooter>
@@ -205,8 +205,8 @@ export default function ProjectsPage() {
               </Field>
               <Field>
                 <FieldLabel>Prompt text</FieldLabel>
-                <Textarea {...form.register("prompt_text")} rows={3} className="resize-none" placeholder="Optional project-level prompt" />
-                <FieldError errors={form.formState.errors.prompt_text ? [form.formState.errors.prompt_text] : undefined} />
+<Textarea {...form.register("prompt_text")} rows={3} className="resize-none max-h-48 overflow-y-auto" placeholder="Optional project-level prompt" />
+              <FieldError errors={form.formState.errors.prompt_text ? [form.formState.errors.prompt_text] : undefined} />
               </Field>
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setEditing(null)}>
