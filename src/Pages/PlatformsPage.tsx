@@ -39,8 +39,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/Shared/components/ui/alert-dialog";
-import { PlatformType } from "@/Shared/models";
 import type { UploadPlatform } from "@/Features/UploadPlatforms/models";
+import { getPlatformTypesQueryOptions } from "@/Features/PlatformTypes/query-options";
 import {
   getUploadPlatformCountQueryOptions,
   getUploadPlatformsQueryOptions,
@@ -57,14 +57,17 @@ const MAX_PLATFORMS = 10;
 
 export default function PlatformsPage() {
   const { data: platforms = [], isLoading } = useQuery(getUploadPlatformsQueryOptions());
+  const { data: platformTypes = [] } = useQuery(getPlatformTypesQueryOptions());
   const { data: count = 0 } = useQuery(getUploadPlatformCountQueryOptions());
   const [editing, setEditing] = useState<UploadPlatform | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<UploadPlatform | null>(null);
 
+  const defaultPlatformTypeId = platformTypes[0]?.id ?? "";
+
   const form = useForm<UploadPlatformFormData>({
     resolver: zodResolver(uploadPlatformSchema),
-    defaultValues: { name: "", platform_type: PlatformType.IG },
+    defaultValues: { name: "", platform_type_id: defaultPlatformTypeId },
   });
 
   const createMutation = useCreateUploadPlatformMutation({
@@ -89,13 +92,13 @@ export default function PlatformsPage() {
     onError: (e) => toast.error(e.message),
   });
 
-  const canAdd = count < MAX_PLATFORMS;
+  const canAdd = count < MAX_PLATFORMS && platformTypes.length > 0;
 
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Upload platforms</h1>
-        <Button onClick={() => { setCreateOpen(true); form.reset({ name: "", platform_type: PlatformType.IG }); }} disabled={!canAdd}>
+        <Button onClick={() => { setCreateOpen(true); form.reset({ name: "", platform_type_id: defaultPlatformTypeId }); }} disabled={!canAdd}>
           <Plus className="mr-2 h-4 w-4" />
           Add platform {count >= MAX_PLATFORMS ? `(max ${MAX_PLATFORMS})` : ""}
         </Button>
@@ -126,13 +129,13 @@ export default function PlatformsPage() {
               platforms.map((p) => (
                 <TableRow key={p.id}>
                   <TableCell className="font-medium">{p.name}</TableCell>
-                  <TableCell>{p.platform_type}</TableCell>
+                  <TableCell>{platformTypes.find((t) => t.id === p.platform_type_id)?.name ?? p.platform_type_id}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => { setEditing(p); form.reset({ name: p.name, platform_type: p.platform_type }); }}
+                        onClick={() => { setEditing(p); form.reset({ name: p.name, platform_type_id: p.platform_type_id }); }}
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
@@ -160,7 +163,7 @@ export default function PlatformsPage() {
           </DialogHeader>
           <form
             onSubmit={form.handleSubmit((data) =>
-              createMutation.mutate({ name: data.name, platform_type: data.platform_type })
+              createMutation.mutate({ name: data.name, platform_type_id: data.platform_type_id })
             )}
             className="space-y-4"
           >
@@ -172,15 +175,18 @@ export default function PlatformsPage() {
             <Field>
               <FieldLabel>Platform type</FieldLabel>
               <Select
-                value={form.watch("platform_type")}
-                onValueChange={(v) => form.setValue("platform_type", v as PlatformType)}
+                value={form.watch("platform_type_id")}
+                onValueChange={(v) => form.setValue("platform_type_id", v)}
               >
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={PlatformType.IG}>IG</SelectItem>
-                  <SelectItem value={PlatformType.Tiktok}>Tiktok</SelectItem>
+                  {platformTypes.map((t) => (
+                    <SelectItem key={t.id} value={t.id}>
+                      {t.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </Field>
@@ -206,7 +212,7 @@ export default function PlatformsPage() {
               onSubmit={form.handleSubmit((data) =>
                 updateMutation.mutate({
                   id: editing.id,
-                  updates: { name: data.name, platform_type: data.platform_type },
+                  updates: { name: data.name, platform_type_id: data.platform_type_id },
                 })
               )}
               className="space-y-4"
@@ -219,15 +225,18 @@ export default function PlatformsPage() {
               <Field>
                 <FieldLabel>Platform type</FieldLabel>
                 <Select
-                  value={form.watch("platform_type")}
-                  onValueChange={(v) => form.setValue("platform_type", v as PlatformType)}
+                  value={form.watch("platform_type_id")}
+                  onValueChange={(v) => form.setValue("platform_type_id", v)}
                 >
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Select type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={PlatformType.IG}>IG</SelectItem>
-                    <SelectItem value={PlatformType.Tiktok}>Tiktok</SelectItem>
+                    {platformTypes.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>
+                        {t.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </Field>

@@ -12,6 +12,7 @@ import {
 } from "@/Shared/components/ui/dialog";
 import { Field, FieldError, FieldLabel } from "@/Shared/components/ui/field";
 import { Input } from "@/Shared/components/ui/input";
+import { Textarea } from "@/Shared/components/ui/textarea";
 import {
   Table,
   TableBody,
@@ -71,16 +72,16 @@ export default function ProjectsPage() {
 
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
-    defaultValues: { name: "" },
+    defaultValues: { name: "", prompt_text: "" },
   });
 
   const openEdit = (p: Project) => {
     setEditing(p);
-    form.reset({ name: p.name });
+    form.reset({ name: p.name, prompt_text: p.prompt_text ?? "" });
   };
   const openCreate = () => {
     setCreateOpen(true);
-    form.reset({ name: "" });
+    form.reset({ name: "", prompt_text: "" });
   };
 
   return (
@@ -97,19 +98,20 @@ export default function ProjectsPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
+              <TableHead>Prompt</TableHead>
               <TableHead className="w-[120px] text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={2} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
                   Loading...
                 </TableCell>
               </TableRow>
             ) : projects.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={2} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
                   No projects yet. Add one to use in generations.
                 </TableCell>
               </TableRow>
@@ -117,6 +119,9 @@ export default function ProjectsPage() {
               projects.map((p) => (
                 <TableRow key={p.id}>
                   <TableCell className="font-medium">{p.name}</TableCell>
+                  <TableCell className="max-w-[200px] truncate text-muted-foreground" title={p.prompt_text ?? undefined}>
+                    {p.prompt_text || "—"}
+                  </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
                       <Button variant="ghost" size="icon" onClick={() => openEdit(p)}>
@@ -146,7 +151,10 @@ export default function ProjectsPage() {
           </DialogHeader>
           <form
             onSubmit={form.handleSubmit((data) => {
-              createMutation.mutate({ name: data.name });
+              createMutation.mutate({
+                name: data.name,
+                prompt_text: data.prompt_text?.trim() || null,
+              });
             })}
             className="space-y-4"
           >
@@ -154,6 +162,11 @@ export default function ProjectsPage() {
               <FieldLabel>Name</FieldLabel>
               <Input {...form.register("name")} placeholder="e.g. Project A" />
               <FieldError errors={form.formState.errors.name ? [form.formState.errors.name] : undefined} />
+            </Field>
+            <Field>
+              <FieldLabel>Prompt text</FieldLabel>
+              <Textarea {...form.register("prompt_text")} rows={3} className="resize-none" placeholder="Optional project-level prompt" />
+              <FieldError errors={form.formState.errors.prompt_text ? [form.formState.errors.prompt_text] : undefined} />
             </Field>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>
@@ -175,7 +188,13 @@ export default function ProjectsPage() {
           {editing && (
             <form
               onSubmit={form.handleSubmit((data) => {
-                updateMutation.mutate({ id: editing.id, updates: { name: data.name } });
+                updateMutation.mutate({
+                  id: editing.id,
+                  updates: {
+                    name: data.name,
+                    prompt_text: data.prompt_text?.trim() || null,
+                  },
+                });
               })}
               className="space-y-4"
             >
@@ -183,6 +202,11 @@ export default function ProjectsPage() {
                 <FieldLabel>Name</FieldLabel>
                 <Input {...form.register("name")} />
                 <FieldError errors={form.formState.errors.name ? [form.formState.errors.name] : undefined} />
+              </Field>
+              <Field>
+                <FieldLabel>Prompt text</FieldLabel>
+                <Textarea {...form.register("prompt_text")} rows={3} className="resize-none" placeholder="Optional project-level prompt" />
+                <FieldError errors={form.formState.errors.prompt_text ? [form.formState.errors.prompt_text] : undefined} />
               </Field>
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setEditing(null)}>

@@ -1,6 +1,6 @@
 export const PlatformType = {
-  IG: "IG",
-  Tiktok: "Tiktok",
+  INSTAGRAM: "INSTAGRAM",
+  TIKTOK: "TIKTOK",
 } as const;
 
 export type PlatformType = (typeof PlatformType)[keyof typeof PlatformType];

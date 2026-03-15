@@ -1,9 +1,8 @@
 import { z } from "zod";
-import { PlatformType } from "@/Shared/models";
 
 export const uploadPlatformSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  platform_type: z.enum([PlatformType.IG, PlatformType.Tiktok]),
+  platform_type_id: z.string().uuid("Select a platform type"),
 });
 
 export type UploadPlatformFormData = z.infer<typeof uploadPlatformSchema>;

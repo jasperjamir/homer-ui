@@ -103,11 +103,11 @@ export function GenerationForm({
           onValueChange={(v) => form.setValue("platform_type", (v as PlatformType) || null)}
         >
           <SelectTrigger>
-            <SelectValue placeholder="IG or Tiktok" />
+            <SelectValue placeholder="Instagram or TikTok" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={PlatformType.IG}>IG</SelectItem>
-            <SelectItem value={PlatformType.Tiktok}>Tiktok</SelectItem>
+            <SelectItem value={PlatformType.INSTAGRAM}>Instagram</SelectItem>
+            <SelectItem value={PlatformType.TIKTOK}>TikTok</SelectItem>
           </SelectContent>
         </Select>
       </Field>
