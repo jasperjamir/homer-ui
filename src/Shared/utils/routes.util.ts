@@ -33,6 +33,10 @@ export function uploadWithGenerationId(generationId: string): string {
   return `/${ROUTE_BASE.UPLOAD}?generation-id=${encodeURIComponent(generationId)}`;
 }
 
+export function uploadWithVideoGenerationId(videoGenerationId: string): string {
+  return `/${ROUTE_BASE.UPLOAD}?generation-id=${encodeURIComponent("video:" + videoGenerationId)}`;
+}
+
 export function videoGenerationDetail(id: string): string {
   return `/${ROUTE_BASE.VIDEO_GENERATIONS}/${id}`;
 }

@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@/Shared/components/ui/table";
 import { getImageGenerationsQueryOptions } from "@/Features/ImageGenerations/query-options";
+import { getVideoGenerationsQueryOptions } from "@/Features/VideoGenerations/query-options";
 import { getUploadPlatformsQueryOptions } from "@/Features/UploadPlatforms/query-options";
 import { getPlatformTypesQueryOptions } from "@/Features/PlatformTypes/query-options";
 import type { PoolAsset } from "@/Features/Upload/models";
@@ -33,6 +34,8 @@ const TIME_FILTER_OPTIONS = [
   { value: "all", label: "All assets", since: () => undefined },
 ] as const;
 
+const VIDEO_PREFIX = "video:";
+
 function useAssetsQuery(filterValue: string) {
   const isGenerationId = filterValue && !TIME_FILTER_OPTIONS.some((o) => o.value === filterValue);
   const since = useMemo(() => {
@@ -40,13 +43,17 @@ function useAssetsQuery(filterValue: string) {
     const opt = TIME_FILTER_OPTIONS.find((o) => o.value === filterValue);
     return opt?.since();
   }, [filterValue, isGenerationId]);
+  const videoGenerationId = isGenerationId && filterValue.startsWith(VIDEO_PREFIX)
+    ? filterValue.slice(VIDEO_PREFIX.length)
+    : undefined;
+  const imageGenerationId = isGenerationId && !videoGenerationId ? filterValue : undefined;
   return useQuery({
     queryKey: ["upload-assets", filterValue, since?.toISOString()],
     queryFn: () =>
       getAssetsInRange({
         since,
         limit: 200,
-        ...(isGenerationId ? { imageGenerationId: filterValue } : {}),
+        ...(videoGenerationId ? { videoGenerationId } : imageGenerationId ? { imageGenerationId } : {}),
       }),
     staleTime: 1000 * 30,
   });
@@ -77,6 +84,7 @@ export default function UploadPage() {
   const [uploading, setUploading] = useState(false);
   const [previewMedia, setPreviewMedia] = useState<{ url: string; type: "image" | "video" } | null>(null);
   const { data: imageGenerations = [] } = useQuery(getImageGenerationsQueryOptions());
+  const { data: videoGenerations = [] } = useQuery(getVideoGenerationsQueryOptions());
   const { data: assets = [], isLoading: assetsLoading } = useAssetsQuery(filterValue);
   const { data: platforms = [], isLoading: platformsLoading } = useQuery(
     getUploadPlatformsQueryOptions()
@@ -84,6 +92,7 @@ export default function UploadPage() {
   const { data: platformTypes = [] } = useQuery(getPlatformTypesQueryOptions());
 
   const isGenerationFilter = filterValue && !TIME_FILTER_OPTIONS.some((o) => o.value === filterValue);
+  const isVideoGenerationFilter = isGenerationFilter && filterValue.startsWith(VIDEO_PREFIX);
 
   const toggle = (asset: PoolAsset, platformId: string) => {
     const k = key(asset, platformId);
@@ -131,7 +140,7 @@ export default function UploadPage() {
     <div className="space-y-6 p-6">
       <h1 className="text-2xl font-semibold">Upload assets</h1>
       <p className="text-muted-foreground text-sm">
-        Choose assets (from the pool) and map them to platforms. Filter by time or by image generation, then check which asset goes to which platform.
+        Choose assets (from the pool) and map them to platforms. Filter by time or by image/video generation, then check which asset goes to which platform.
       </p>
 
       <Card>
@@ -151,8 +160,17 @@ export default function UploadPage() {
                 {imageGenerations.length > 0 && (
                   <>
                     {imageGenerations.map((g) => (
-                      <SelectItem key={g.id} value={g.id}>
-                        Generation {new Date(g.createdAt).toLocaleString()}
+                      <SelectItem key={`img-${g.id}`} value={g.id}>
+                        Image: {new Date(g.createdAt).toLocaleString()}
+                      </SelectItem>
+                    ))}
+                  </>
+                )}
+                {videoGenerations.length > 0 && (
+                  <>
+                    {videoGenerations.map((g) => (
+                      <SelectItem key={`vid-${g.id}`} value={`${VIDEO_PREFIX}${g.id}`}>
+                        Video: {new Date(g.createdAt).toLocaleString()}
                       </SelectItem>
                     ))}
                   </>
@@ -173,7 +191,9 @@ export default function UploadPage() {
           ) : assets.length === 0 ? (
             <p className="text-muted-foreground">
               {isGenerationFilter
-                ? "No images in this generation yet."
+                ? isVideoGenerationFilter
+                  ? "No videos in this generation yet."
+                  : "No images in this generation yet."
                 : "No assets in this range. Generate some images or videos first."}
             </p>
           ) : (

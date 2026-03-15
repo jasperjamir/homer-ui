@@ -13,7 +13,7 @@ import {
 import { Badge } from "@/Shared/components/ui/badge";
 import { VIDEO_MODEL_LABELS } from "@/Features/ImageGenerations/schemas";
 import { PlatformType, PLATFORM_TYPE_LABELS } from "@/Shared/models/platform.type";
-import { ROUTES, videoGenerationStoryboard } from "@/Shared/utils/routes.util";
+import { ROUTES, uploadWithVideoGenerationId, videoGenerationStoryboard } from "@/Shared/utils/routes.util";
 
 /** Video aspect ratio: Instagram Reels and TikTok both use 9:16 */
 const VIDEO_ASPECT_CLASS = "aspect-[9/16]";
@@ -201,7 +201,7 @@ export default function VideoGenerationDetailPage() {
           <Link to={videoGenerationStoryboard(id)}>Edit storyboard</Link>
         </Button>
         <Button asChild>
-          <Link to={ROUTES.UPLOAD}>Go to Upload (map to platforms)</Link>
+          <Link to={uploadWithVideoGenerationId(id)}>Go to Upload (map to platforms)</Link>
         </Button>
       </div>
     </div>
