@@ -40,7 +40,7 @@ export default function ImageGenerationNewPage() {
       </div>
       <div className="flex flex-1 flex-col items-center justify-center">
         <Card className="w-full max-w-2xl mt-6">
-          <CardContent className="pt-6">
+          <CardContent>
           <GenerationForm
             onSubmit={handleSubmit}
             isLoading={createMutation.isPending}

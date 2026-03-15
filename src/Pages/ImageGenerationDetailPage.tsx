@@ -10,7 +10,9 @@ import {
   getImageGenerationAssetsWithPollingQueryOptions,
   getImageGenerationQueryOptions,
 } from "@/Features/ImageGenerations/query-options";
-import { PlatformType } from "@/Shared/models/platform.type";
+import { Badge } from "@/Shared/components/ui/badge";
+import { IMAGE_MODEL_LABELS } from "@/Features/ImageGenerations/schemas";
+import { PlatformType, PLATFORM_TYPE_LABELS } from "@/Shared/models/platform.type";
 import { JourneyStepper, getImageJourneySteps } from "@/Shared/components/JourneyStepper";
 import { uploadWithGenerationId } from "@/Shared/utils/routes.util";
 
@@ -66,16 +68,21 @@ export default function ImageGenerationDetailPage() {
       <Card className="border-0 shadow-none">
         <CardHeader className="space-y-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <CardTitle className="mb-0">Image links</CardTitle>
+            <div className="flex flex-wrap items-center gap-2">
+              <CardTitle className="mb-0">Image links</CardTitle>
+              {generation.platformType && (
+                <Badge variant="secondary">
+                  {PLATFORM_TYPE_LABELS[generation.platformType]}
+                </Badge>
+              )}
+              {generation.model && generation.model in IMAGE_MODEL_LABELS && (
+                <Badge variant="outline">{IMAGE_MODEL_LABELS[generation.model as keyof typeof IMAGE_MODEL_LABELS]}</Badge>
+              )}
+            </div>
             <span className="font-medium tabular-nums text-sm">
               {assets.length}/{generation.assetCount}
             </span>
           </div>
-          <p className="text-muted-foreground text-sm">
-            {assets.length < generation.assetCount
-              ? "Generating…"
-              : "Use the Upload page to map these to platforms."}
-          </p>
           <div
             className="flex gap-1"
             role="progressbar"

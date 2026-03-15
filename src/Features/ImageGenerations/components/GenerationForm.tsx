@@ -93,6 +93,7 @@ export function GenerationForm({
           placeholder="e.g. Granddaughter asking her grandmother to have an online neurologist checkup"
           rows={4}
           className="resize-none"
+          autoFocus
         />
         <FieldError errors={form.formState.errors.context ? [form.formState.errors.context] : undefined} />
       </Field>
