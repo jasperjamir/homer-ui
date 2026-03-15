@@ -6,7 +6,9 @@ export interface VideoGeneration {
   projectId: string | null;
   marketingPromptId: string | null;
   platformType: PlatformType | null;
+  model: "GROK" | "SORA" | null;
   assetCount: number;
+  duration: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -38,6 +40,8 @@ export interface CreateVideoStoryboardRequest {
   context: string;
   platformType: PlatformType | null;
   assetCount: number;
+  model: "GROK" | "SORA";
+  duration: number;
 }
 
 /** API request payload for POST /video/generate */
@@ -45,6 +49,7 @@ export interface GenerateVideoFromStoryboardRequest {
   videoGenerationStoryboardId: string;
   storyboard: Record<string, unknown>;
   videoGenerationId: string;
+  duration: number;
 }
 
 /** A single frame in the storyboard */

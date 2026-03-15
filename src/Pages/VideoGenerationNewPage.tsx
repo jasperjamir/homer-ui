@@ -23,12 +23,14 @@ export default function VideoGenerationNewPage() {
       context: data.context,
       platformType: data.platformType ?? null,
       assetCount: data.assetCount,
+      model: (data.model === "SORA" ? "SORA" : "GROK"),
+      duration: data.duration ?? 12,
     });
   };
 
   return (
-    <div className="p-6 max-w-2xl">
-      <Card>
+    <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-6">
+      <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle>Step 1: Create storyboard</CardTitle>
           <p className="text-muted-foreground text-sm">
@@ -40,6 +42,9 @@ export default function VideoGenerationNewPage() {
             onSubmit={handleSubmit}
             isLoading={createMutation.isPending}
             submitLabel="Create storyboard"
+            showModelField
+            modelType="video"
+            showDurationField
           />
         </CardContent>
       </Card>

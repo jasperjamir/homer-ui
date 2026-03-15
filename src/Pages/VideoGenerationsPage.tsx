@@ -14,6 +14,9 @@ import {
   getVideoGenerationAssetCountsQueryOptions,
   getVideoGenerationsQueryOptions,
 } from "@/Features/VideoGenerations/query-options";
+import { VIDEO_MODEL_LABELS } from "@/Features/ImageGenerations/schemas";
+import { Badge } from "@/Shared/components/ui/badge";
+import { PLATFORM_TYPE_LABELS } from "@/Shared/models/platform.type";
 import { ROUTES, videoGenerationDetail, videoGenerationStoryboard } from "@/Shared/utils/routes.util";
 
 export default function VideoGenerationsPage() {
@@ -38,6 +41,8 @@ export default function VideoGenerationsPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Context</TableHead>
+              <TableHead>Model</TableHead>
+              <TableHead>Platform</TableHead>
               <TableHead>Assets</TableHead>
               <TableHead>Created</TableHead>
               <TableHead className="w-[180px]">Actions</TableHead>
@@ -46,13 +51,13 @@ export default function VideoGenerationsPage() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                  Loading...
+                <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                  Generating...
                 </TableCell>
               </TableRow>
             ) : generations.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                   No video generations yet. Create a storyboard to get started.
                 </TableCell>
               </TableRow>
@@ -60,6 +65,20 @@ export default function VideoGenerationsPage() {
               generations.map((g) => (
                 <TableRow key={g.id}>
                   <TableCell className="max-w-md truncate">{g.context}</TableCell>
+                  <TableCell>
+                    {g.model && g.model in VIDEO_MODEL_LABELS ? (
+                      <Badge variant="secondary">{VIDEO_MODEL_LABELS[g.model as keyof typeof VIDEO_MODEL_LABELS]}</Badge>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {g.platformType && g.platformType in PLATFORM_TYPE_LABELS ? (
+                      <Badge variant="outline">{PLATFORM_TYPE_LABELS[g.platformType as keyof typeof PLATFORM_TYPE_LABELS]}</Badge>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
                   <TableCell>
                     {(assetCounts[g.id] ?? 0)}/{g.assetCount}
                   </TableCell>

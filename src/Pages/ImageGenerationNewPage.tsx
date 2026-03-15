@@ -23,13 +23,13 @@ export default function ImageGenerationNewPage() {
       context: data.context,
       platformType: data.platformType ?? null,
       assetCount: data.assetCount,
-      model: data.model ?? "GROK",
+      model: data.model === "NANO BANANA" ? "NANO BANANA" : "GROK",
     });
   };
 
   return (
-    <div className="p-6 max-w-2xl">
-      <Card>
+    <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-6">
+      <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle>Step 1: Generate images</CardTitle>
           <p className="text-muted-foreground text-sm">
@@ -42,6 +42,7 @@ export default function ImageGenerationNewPage() {
             isLoading={createMutation.isPending}
             submitLabel="Generate images"
             showModelField
+            modelType="image"
           />
         </CardContent>
       </Card>

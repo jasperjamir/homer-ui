@@ -60,7 +60,7 @@ export default function VideoGenerationStoryboardPage() {
     localContent.frames.some((f) => !f.scene.trim() || !f.description.trim());
 
   const handleSaveAndGenerate = async () => {
-    if (!id || !storyboard || !localContent) return;
+    if (!id || !storyboard || !localContent || !generation) return;
     if (localContent.frames.length === 0) {
       toast.error("Add at least one frame before generating.");
       return;
@@ -76,6 +76,7 @@ export default function VideoGenerationStoryboardPage() {
         videoGenerationStoryboardId: storyboard.id,
         storyboard: record,
         videoGenerationId: id,
+        duration: generation.duration ?? 12,
       });
     } catch {
       // Mutation errors are handled by onError
@@ -83,7 +84,7 @@ export default function VideoGenerationStoryboardPage() {
   };
 
   if (!id) return <div className="p-6">Missing generation ID</div>;
-  if (genLoading || !generation) return <div className="p-6">Loading...</div>;
+  if (genLoading || !generation) return <div className="p-6">Generating...</div>;
 
   return (
     <div className="space-y-6 p-6">

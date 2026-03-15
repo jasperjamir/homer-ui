@@ -53,7 +53,7 @@ export default function ImageGenerationDetailPage() {
   });
 
   if (!id) return <div className="p-6">Missing generation ID</div>;
-  if (genLoading || !generation) return <div className="p-6">Loading...</div>;
+  if (genLoading || !generation) return <div className="p-6">Generating...</div>;
 
   const aspectClass = getAspectClass(generation.platformType);
 
@@ -127,7 +127,7 @@ export default function ImageGenerationDetailPage() {
         </CardHeader>
         <CardContent>
           {assetsLoading ? (
-            <p className="text-muted-foreground">Loading assets...</p>
+            <p className="text-muted-foreground">Generating assets...</p>
           ) : (
             <>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
@@ -185,7 +185,7 @@ export default function ImageGenerationDetailPage() {
                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground">
                         <div className="size-8 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
                         <span className="text-xs font-medium">
-                          Loading image {assets.length + 1}…
+                          Generating image {assets.length + 1}…
                         </span>
                       </div>
                       <span

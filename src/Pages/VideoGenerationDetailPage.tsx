@@ -13,6 +13,9 @@ import {
   getVideoGenerationAssetsWithPollingQueryOptions,
   getVideoGenerationQueryOptions,
 } from "@/Features/VideoGenerations/query-options";
+import { Badge } from "@/Shared/components/ui/badge";
+import { VIDEO_MODEL_LABELS } from "@/Features/ImageGenerations/schemas";
+import { PlatformType, PLATFORM_TYPE_LABELS } from "@/Shared/models/platform.type";
 import { ROUTES, videoGenerationStoryboard } from "@/Shared/utils/routes.util";
 
 /** Video aspect ratio: Instagram Reels and TikTok both use 9:16 */
@@ -48,7 +51,7 @@ export default function VideoGenerationDetailPage() {
   });
 
   if (!id) return <div className="p-6">Missing generation ID</div>;
-  if (genLoading || !generation) return <div className="p-6">Loading...</div>;
+  if (genLoading || !generation) return <div className="p-6">Generating...</div>;
 
   return (
     <div className="space-y-6 p-6">
@@ -62,8 +65,18 @@ export default function VideoGenerationDetailPage() {
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>Context</CardTitle>
-          <p className="text-muted-foreground text-sm">{generation.context}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <CardTitle className="mb-0">Context</CardTitle>
+            {generation.platformType && (
+              <Badge variant="secondary">
+                {PLATFORM_TYPE_LABELS[generation.platformType]}
+              </Badge>
+            )}
+            {generation.model && (
+              <Badge variant="outline">{VIDEO_MODEL_LABELS[generation.model]}</Badge>
+            )}
+          </div>
+          <p className="text-muted-foreground text-sm mt-2">{generation.context}</p>
         </CardHeader>
       </Card>
       <Card>
@@ -110,7 +123,7 @@ export default function VideoGenerationDetailPage() {
         </CardHeader>
         <CardContent>
           {assetsLoading ? (
-            <p className="text-muted-foreground">Loading assets...</p>
+            <p className="text-muted-foreground">Generating assets...</p>
           ) : (
             <>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
@@ -169,7 +182,7 @@ export default function VideoGenerationDetailPage() {
                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground">
                         <div className="size-8 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
                         <span className="text-xs font-medium">
-                          Loading video {assets.length + 1}…
+                          Generating video {assets.length + 1}…
                         </span>
                       </div>
                       <span

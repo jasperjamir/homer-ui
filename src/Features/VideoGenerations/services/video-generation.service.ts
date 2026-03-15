@@ -9,13 +9,16 @@ import { api } from "@/Shared/services/api";
 import { supabase } from "@/Shared/lib/supabase";
 
 function toVideoGeneration(row: Record<string, unknown>): VideoGeneration {
+  const duration = row.duration;
   return {
     id: row.id as string,
     context: row.context as string,
     projectId: row.project_id as string | null,
     marketingPromptId: row.marketing_prompt_id as string | null,
     platformType: (row.platform_type ?? row.platform_type_id) as VideoGeneration["platformType"],
+    model: (row.model as VideoGeneration["model"]) ?? null,
     assetCount: row.asset_count as number,
+    duration: typeof duration === "number" && !Number.isNaN(duration) ? duration : null,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
   };
