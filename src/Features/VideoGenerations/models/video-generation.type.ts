@@ -67,7 +67,7 @@ export function parseStoryboardContent(content: Record<string, unknown>): Storyb
     .filter((f): f is Record<string, unknown> => f != null && typeof f === "object")
     .map((f) => ({
       scene: typeof f.scene === "string" ? f.scene : "",
-      duration: typeof f.duration === "number" ? f.duration : 2,
+      duration: Math.min(15, Math.max(1, typeof f.duration === "number" ? f.duration : 2)),
       description: typeof f.description === "string" ? f.description : "",
     }));
   return { frames };

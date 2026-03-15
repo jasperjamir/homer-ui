@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Shared/components/ui
 import { Button } from "@/Shared/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import {
+  getVideoGenerationAssetsQueryOptions,
   getVideoGenerationQueryOptions,
   getVideoGenerationStoryboardWithPollingQueryOptions,
   useGenerateVideoFromStoryboardMutation,
@@ -30,6 +31,11 @@ export default function VideoGenerationStoryboardPage() {
   const { data: storyboard, isLoading: sbLoading } = useQuery(
     getVideoGenerationStoryboardWithPollingQueryOptions(id ?? "")
   );
+  const { data: assets } = useQuery(
+    getVideoGenerationAssetsQueryOptions(id ?? "")
+  );
+
+  const hasGeneratedVideo = (assets?.length ?? 0) > 0;
 
   useEffect(() => {
     if (storyboard) setLocalContent(parseStoryboardContent(storyboard.content));
@@ -48,11 +54,19 @@ export default function VideoGenerationStoryboardPage() {
   });
 
   const isPending = updateMutation.isPending || generateMutation.isPending;
+  const hasEmptyFrames =
+    localContent != null &&
+    localContent.frames.length > 0 &&
+    localContent.frames.some((f) => !f.scene.trim() || !f.description.trim());
 
   const handleSaveAndGenerate = async () => {
     if (!id || !storyboard || !localContent) return;
     if (localContent.frames.length === 0) {
       toast.error("Add at least one frame before generating.");
+      return;
+    }
+    if (hasEmptyFrames) {
+      toast.error("Fill in Summary and Visual description for all frames before generating.");
       return;
     }
     try {
@@ -85,7 +99,9 @@ export default function VideoGenerationStoryboardPage() {
         <CardHeader>
           <CardTitle>Step 2: Storyboard</CardTitle>
           <p className="text-muted-foreground text-sm">
-            Edit each frame below, then click Save storyboard and generate video.
+            {hasGeneratedVideo
+              ? "Video has been generated from this storyboard. The storyboard is read-only."
+              : "Edit each frame below, then click Save storyboard and generate video."}
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -99,13 +115,16 @@ export default function VideoGenerationStoryboardPage() {
               <StoryboardEditor
                 content={localContent}
                 onChange={setLocalContent}
+                disabled={hasGeneratedVideo}
               />
-              <Button
-                onClick={handleSaveAndGenerate}
-                disabled={isPending}
-              >
-                {isPending ? "Saving & generating…" : "Save storyboard and generate video"}
-              </Button>
+              {!hasGeneratedVideo && (
+                <Button
+                  onClick={handleSaveAndGenerate}
+                  disabled={isPending || hasEmptyFrames}
+                >
+                  {isPending ? "Saving & generating…" : "Save storyboard and generate video"}
+                </Button>
+              )}
             </>
           ) : null}
         </CardContent>
