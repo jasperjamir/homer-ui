@@ -8,20 +8,23 @@ import { Textarea } from "@/Shared/components/ui/textarea";
 import { ArrowLeft } from "lucide-react";
 import {
   getVideoGenerationQueryOptions,
-  getVideoGenerationStoryboardQueryOptions,
+  getVideoGenerationStoryboardWithPollingQueryOptions,
+  useGenerateVideoFromStoryboardMutation,
   useUpdateStoryboardMutation,
 } from "@/Features/VideoGenerations/query-options";
-import { ROUTES, videoGenerationDetail, videoGenerationStoryboard } from "@/Shared/utils/routes.util";
+import { useNavigate } from "react-router";
+import { ROUTES, videoGenerationDetail } from "@/Shared/utils/routes.util";
 
 export default function VideoGenerationStoryboardPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [localContent, setLocalContent] = useState<string>("");
 
   const { data: generation, isLoading: genLoading } = useQuery(
     getVideoGenerationQueryOptions(id ?? "")
   );
   const { data: storyboard, isLoading: sbLoading } = useQuery(
-    getVideoGenerationStoryboardQueryOptions(id ?? "")
+    getVideoGenerationStoryboardWithPollingQueryOptions(id ?? "")
   );
 
   useEffect(() => {
@@ -29,22 +32,34 @@ export default function VideoGenerationStoryboardPage() {
   }, [storyboard?.id]);
 
   const updateMutation = useUpdateStoryboardMutation(id ?? "", {
+    onError: (e) => toast.error(e.message),
+  });
+
+  const generateMutation = useGenerateVideoFromStoryboardMutation({
     onSuccess: () => {
-      toast.success("Storyboard saved");
+      toast.success("Video generation started");
+      navigate(videoGenerationDetail(id ?? ""));
     },
     onError: (e) => toast.error(e.message),
   });
 
-  const isEditing =
-    localContent !== "" &&
-    localContent !== JSON.stringify(storyboard?.content ?? {}, null, 2);
+  const isPending = updateMutation.isPending || generateMutation.isPending;
 
-  const handleSave = () => {
+  const handleSaveAndGenerate = async () => {
     try {
-      const parsed = JSON.parse(localContent) as Record<string, unknown>;
-      updateMutation.mutate(parsed);
-    } catch {
-      toast.error("Invalid JSON");
+      const parsed = JSON.parse(localContent || "{}") as Record<string, unknown>;
+      if (!id || !storyboard) return;
+      await updateMutation.mutateAsync(parsed);
+      generateMutation.mutate({
+        videoGenerationStoryboardId: storyboard.id,
+        storyboard: parsed,
+        videoGenerationId: id,
+      });
+    } catch (e) {
+      if (e instanceof SyntaxError) {
+        toast.error("Invalid JSON. Fix the storyboard before generating.");
+      }
+      // Mutation errors are handled by onError
     }
   };
 
@@ -63,14 +78,17 @@ export default function VideoGenerationStoryboardPage() {
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>Step 2: Storyboard (mock output)</CardTitle>
+          <CardTitle>Step 2: Storyboard</CardTitle>
           <p className="text-muted-foreground text-sm">
-            Edit the storyboard JSON. Replace with real storyboard generation later.
+            Edit the storyboard JSON, then click Save storyboard and generate video.
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
-          {sbLoading ? (
-            <p className="text-muted-foreground">Loading storyboard...</p>
+          {sbLoading || !storyboard ? (
+            <div className="flex min-h-[200px] flex-col items-center justify-center gap-2 text-muted-foreground">
+              <div className="size-8 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+              <span>Generating storyboard...</span>
+            </div>
           ) : (
             <>
               <Textarea
@@ -80,17 +98,12 @@ export default function VideoGenerationStoryboardPage() {
                 className="font-mono text-sm resize-y"
                 placeholder='{"frames": [...]}'
               />
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleSave}
-                  disabled={updateMutation.isPending || !isEditing}
-                >
-                  {updateMutation.isPending ? "Saving…" : "Save storyboard"}
-                </Button>
-                <Button variant="outline" asChild>
-                  <Link to={videoGenerationDetail(id)}>Next: Generate video</Link>
-                </Button>
-              </div>
+              <Button
+                onClick={handleSaveAndGenerate}
+                disabled={isPending}
+              >
+                {isPending ? "Saving & generating…" : "Save storyboard and generate video"}
+              </Button>
             </>
           )}
         </CardContent>

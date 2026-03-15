@@ -13,7 +13,13 @@ import {
   getImageGenerationAssetsWithPollingQueryOptions,
   getImageGenerationQueryOptions,
 } from "@/Features/ImageGenerations/query-options";
+import { PlatformType } from "@/Shared/models/platform.type";
 import { ROUTES } from "@/Shared/utils/routes.util";
+
+/** Aspect ratio classes: Instagram 4:5, TikTok 9:16 */
+function getAspectClass(platformType: PlatformType | null): string {
+  return platformType === PlatformType.TIKTOK ? "aspect-[9/16]" : "aspect-[4/5]";
+}
 
 function NoImagePlaceholder({ className }: { className?: string }) {
   return (
@@ -46,6 +52,8 @@ export default function ImageGenerationDetailPage() {
 
   if (!id) return <div className="p-6">Missing generation ID</div>;
   if (genLoading || !generation) return <div className="p-6">Loading...</div>;
+
+  const aspectClass = getAspectClass(generation.platformType);
 
   return (
     <div className="space-y-6 p-6">
@@ -120,7 +128,7 @@ export default function ImageGenerationDetailPage() {
                           setPreviewUrl(asset.assetUrl);
                           setPreviewLoadError(false);
                         }}
-                        className="relative w-full aspect-square rounded overflow-hidden cursor-zoom-in hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                        className={`relative w-full ${aspectClass} rounded overflow-hidden cursor-zoom-in hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2`}
                       >
                         <img
                           src={asset.assetUrl}
@@ -146,8 +154,8 @@ export default function ImageGenerationDetailPage() {
                         </span>
                       </button>
                     ) : (
-                      <div className="relative w-full aspect-square rounded overflow-hidden">
-                        <NoImagePlaceholder className="w-full aspect-square" />
+                      <div className={`relative w-full ${aspectClass} rounded overflow-hidden`}>
+                        <NoImagePlaceholder className={`w-full ${aspectClass}`} />
                         <span
                           className="absolute bottom-2 left-2 rounded-md bg-black/70 px-2 py-0.5 text-xs font-medium text-white"
                           aria-hidden
@@ -160,7 +168,7 @@ export default function ImageGenerationDetailPage() {
                 ))}
                 {assets.length < generation.assetCount && (
                   <div className="rounded-lg border border-dashed border-muted-foreground/30 p-2">
-                    <div className="relative w-full aspect-square rounded overflow-hidden">
+                    <div className={`relative w-full ${aspectClass} rounded overflow-hidden`}>
                       <Skeleton className="absolute inset-0 rounded" />
                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground">
                         <div className="size-8 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
@@ -192,15 +200,17 @@ export default function ImageGenerationDetailPage() {
                   showCloseButton={true}
                 >
                   {showPreviewPlaceholder ? (
-                    <NoImagePlaceholder className="min-h-[300px] w-full" />
+                    <NoImagePlaceholder className={`min-h-[300px] w-full ${aspectClass}`} />
                   ) : (
                     previewUrl && (
-                      <img
-                        src={previewUrl}
-                        alt="Preview"
-                        className="w-full max-h-[85vh] object-contain rounded-lg"
-                        onError={() => setPreviewLoadError(true)}
-                      />
+                      <div className={`w-full max-h-[85vh] ${aspectClass}`}>
+                        <img
+                          src={previewUrl}
+                          alt="Preview"
+                          className="w-full h-full object-contain rounded-lg"
+                          onError={() => setPreviewLoadError(true)}
+                        />
+                      </div>
                     )
                   )}
                 </DialogContent>

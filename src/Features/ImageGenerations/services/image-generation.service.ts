@@ -66,7 +66,7 @@ export async function getImageGenerationAssets(
 export async function createImageGeneration(
   input: CreateImageGenerationRequest,
 ): Promise<ImageGeneration> {
-  const { data } = await api.post<ImageGeneration>("/generate-image", input);
+  const { data } = await api.post<ImageGeneration>("/image/generate", input);
   return data;
 }
 

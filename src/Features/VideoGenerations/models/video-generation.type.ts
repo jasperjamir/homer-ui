@@ -1,33 +1,51 @@
+import type { PlatformType } from "@/Shared/models/platform.type";
+
 export interface VideoGeneration {
   id: string;
   context: string;
-  project_id: string | null;
-  marketing_prompt_id: string | null;
-  platform_type_id: string | null;
-  asset_count: number;
-  created_at: string;
-  updated_at: string;
+  projectId: string | null;
+  marketingPromptId: string | null;
+  platformType: PlatformType | null;
+  assetCount: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface VideoGenerationStoryboard {
   id: string;
-  video_generation_id: string;
+  videoGenerationId: string;
   content: Record<string, unknown>;
-  updated_at: string;
+  updatedAt: string;
 }
 
 export interface VideoGenerationAsset {
   id: string;
-  video_generation_id: string;
+  videoGenerationId: string;
   index: number;
-  asset_url: string | null;
-  created_at: string;
+  assetUrl: string | null;
+  createdAt: string;
 }
 
 export type VideoGenerationInsert = Omit<
   VideoGeneration,
-  "id" | "created_at" | "updated_at"
+  "id" | "createdAt" | "updatedAt"
 >;
+
+/** API request payload for POST /video/storyboard */
+export interface CreateVideoStoryboardRequest {
+  marketingPromptId: string | null;
+  projectId: string | null;
+  context: string;
+  platformType: PlatformType | null;
+  assetCount: number;
+}
+
+/** API request payload for POST /video/generate */
+export interface GenerateVideoFromStoryboardRequest {
+  videoGenerationStoryboardId: string;
+  storyboard: Record<string, unknown>;
+  videoGenerationId: string;
+}
 
 /** Default mock storyboard structure for MVP */
 export const MOCK_STORYBOARD_CONTENT: Record<string, unknown> = {

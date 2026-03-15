@@ -24,7 +24,7 @@ export type ImageGenerationInsert = Omit<
   "id" | "createdAt" | "updatedAt"
 >;
 
-/** API request payload for POST /generate-image */
+/** API request payload for POST /image/generate */
 export interface CreateImageGenerationRequest {
   marketingPromptId: string | null;
   projectId: string | null;

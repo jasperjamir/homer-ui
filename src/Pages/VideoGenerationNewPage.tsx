@@ -10,7 +10,7 @@ export default function VideoGenerationNewPage() {
   const navigate = useNavigate();
   const createMutation = useCreateVideoGenerationMutation({
     onSuccess: (id) => {
-      toast.success("Storyboard created (mock)");
+      toast.success("Storyboard created");
       navigate(videoGenerationStoryboard(id));
     },
     onError: (e) => toast.error(e.message),
@@ -18,11 +18,11 @@ export default function VideoGenerationNewPage() {
 
   const handleSubmit = (data: GenerationFormData) => {
     createMutation.mutate({
+      marketingPromptId: data.marketingPromptId ?? null,
+      projectId: data.projectId ?? null,
       context: data.context,
-      project_id: data.project_id ?? null,
-      marketing_prompt_id: data.marketing_prompt_id ?? null,
-      platform_type_id: data.platform_type_id ?? null,
-      asset_count: data.asset_count,
+      platformType: data.platformType ?? null,
+      assetCount: data.assetCount,
     });
   };
 
@@ -30,9 +30,9 @@ export default function VideoGenerationNewPage() {
     <div className="p-6 max-w-2xl">
       <Card>
         <CardHeader>
-          <CardTitle>Step 1: Generate storyboard</CardTitle>
+          <CardTitle>Step 1: Create storyboard</CardTitle>
           <p className="text-muted-foreground text-sm">
-            Submit to create a video generation with a mock storyboard. Edit it in the next step, then generate video links.
+            Submit to create a storyboard via the API. Edit it in the next step, then generate videos.
           </p>
         </CardHeader>
         <CardContent>

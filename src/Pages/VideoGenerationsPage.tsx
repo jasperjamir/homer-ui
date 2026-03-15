@@ -23,7 +23,7 @@ export default function VideoGenerationsPage() {
         <Button asChild>
           <Link to={ROUTES.VIDEO_GENERATIONS_NEW}>
             <Plus className="mr-2 h-4 w-4" />
-            Generate storyboard
+            Create storyboard
           </Link>
         </Button>
       </div>
@@ -47,16 +47,16 @@ export default function VideoGenerationsPage() {
             ) : generations.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                  No video generations yet. Create one to get a mock storyboard, then generate video links.
+                  No video generations yet. Create a storyboard to get started.
                 </TableCell>
               </TableRow>
             ) : (
               generations.map((g) => (
                 <TableRow key={g.id}>
                   <TableCell className="max-w-md truncate">{g.context}</TableCell>
-                  <TableCell>{g.asset_count}</TableCell>
+                  <TableCell>{g.assetCount}</TableCell>
                   <TableCell className="text-muted-foreground text-sm">
-                    {new Date(g.created_at).toLocaleString()}
+                    {new Date(g.createdAt).toLocaleString()}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">

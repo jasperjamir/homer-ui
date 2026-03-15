@@ -1,9 +1,13 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { VideoGenerationInsert } from "@/Features/VideoGenerations/models";
+import type {
+  CreateVideoStoryboardRequest,
+  GenerateVideoFromStoryboardRequest,
+  VideoGenerationAsset,
+} from "@/Features/VideoGenerations/models";
 import {
-  createVideoGenerationWithMockStoryboard,
+  createVideoStoryboard,
   deleteVideoGeneration,
-  generateMockVideoLinks,
+  generateVideoFromStoryboard,
   getVideoGenerationAssets,
   getVideoGenerationById,
   getVideoGenerationStoryboard,
@@ -35,6 +39,21 @@ export function getVideoGenerationStoryboardQueryOptions(videoGenerationId: stri
   });
 }
 
+/** Storyboard query with polling until a storyboard exists */
+export function getVideoGenerationStoryboardWithPollingQueryOptions(
+  videoGenerationId: string
+) {
+  return queryOptions({
+    queryKey: ["video-generation-storyboard", videoGenerationId],
+    queryFn: () => getVideoGenerationStoryboard(videoGenerationId),
+    enabled: !!videoGenerationId,
+    refetchInterval: (query) => {
+      if (query.state.data != null) return false;
+      return 2000; // poll every 2 seconds until storyboard exists
+    },
+  });
+}
+
 export function getVideoGenerationAssetsQueryOptions(videoGenerationId: string) {
   return queryOptions({
     queryKey: ["video-generation-assets", videoGenerationId],
@@ -43,12 +62,30 @@ export function getVideoGenerationAssetsQueryOptions(videoGenerationId: string) 
   });
 }
 
+/** Assets query with polling while asset count < expected assetCount */
+export function getVideoGenerationAssetsWithPollingQueryOptions(
+  videoGenerationId: string,
+  expectedAssetCount: number
+) {
+  return queryOptions({
+    queryKey: ["video-generation-assets", videoGenerationId],
+    queryFn: () => getVideoGenerationAssets(videoGenerationId),
+    enabled: !!videoGenerationId && expectedAssetCount > 0,
+    refetchInterval: (query) => {
+      const assets = (query.state.data as VideoGenerationAsset[] | undefined) ?? [];
+      if (assets.length >= expectedAssetCount) return false;
+      return 2000; // poll every 2 seconds
+    },
+  });
+}
+
 export function useCreateVideoGenerationMutation(options?: {
   onSuccess?: (id: string) => void;
+  onError?: (error: Error) => void;
 }) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: VideoGenerationInsert) => createVideoGenerationWithMockStoryboard(input),
+    mutationFn: (input: CreateVideoStoryboardRequest) => createVideoStoryboard(input),
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ["video-generations"] });
       qc.invalidateQueries({ queryKey: ["video-generation", data.id] });
@@ -56,6 +93,23 @@ export function useCreateVideoGenerationMutation(options?: {
       qc.invalidateQueries({ queryKey: ["video-generation-assets", data.id] });
       options?.onSuccess?.(data.id);
     },
+    onError: options?.onError,
+  });
+}
+
+export function useGenerateVideoFromStoryboardMutation(options?: {
+  onSuccess?: () => void;
+  onError?: (error: Error) => void;
+}) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: GenerateVideoFromStoryboardRequest) =>
+      generateVideoFromStoryboard(input),
+    onSuccess: (_data, variables) => {
+      qc.invalidateQueries({ queryKey: ["video-generation-assets", variables.videoGenerationId] });
+      options?.onSuccess?.();
+    },
+    onError: options?.onError,
   });
 }
 
@@ -66,17 +120,6 @@ export function useUpdateStoryboardMutation(videoGenerationId: string, options?:
       updateVideoGenerationStoryboard(videoGenerationId, content),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["video-generation-storyboard", videoGenerationId] });
-      options?.onSuccess?.();
-    },
-  });
-}
-
-export function useGenerateMockVideoLinksMutation(videoGenerationId: string, options?: { onSuccess?: () => void }) {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: () => generateMockVideoLinks(videoGenerationId),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["video-generation-assets", videoGenerationId] });
       options?.onSuccess?.();
     },
   });
