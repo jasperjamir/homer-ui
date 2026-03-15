@@ -24,7 +24,7 @@ const PROCESS_STEPS = [
   {
     label: "LAUNCH",
     number: "3",
-    description: "Publish it to your chosen platform. 🚀",
+    description: "Publish it to your chosen platform.",
   },
 ] as const;
 

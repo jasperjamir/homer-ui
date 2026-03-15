@@ -95,7 +95,7 @@ const VALIDATE_CONTEXT =
   "Ensure the message is clear, the visual is easy to understand, and the content matches your brand.";
 
 const LAUNCH_DESCRIPTION =
-  "Publish it to your chosen platform. 🚀";
+  "Publish it to your chosen platform.";
 
 /** Image journey: (1) IDEATE → (2.1) VALIDATE → (3) LAUNCH */
 export function getImageJourneySteps(context: {
