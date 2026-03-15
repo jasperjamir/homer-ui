@@ -39,7 +39,7 @@ export function NavMain({ items }: { items: SidebarConfig[] }) {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel>Navigation</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
           // If item has no sub-items, render as a link

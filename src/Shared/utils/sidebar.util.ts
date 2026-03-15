@@ -1,13 +1,4 @@
-import {
-  Home,
-  ImageIcon,
-  Video,
-  Upload,
-  FolderOpen,
-  MessageSquare,
-  Globe,
-  type LucideIcon,
-} from "lucide-react";
+import { Home, Upload, Sparkles, Settings2, type LucideIcon } from "lucide-react";
 import { ROUTES } from "./routes.util";
 
 export type SidebarConfig = {
@@ -20,30 +11,28 @@ export type SidebarConfig = {
 
 const SIDEBAR_ITEMS: SidebarConfig[] = [
   { title: "Home", url: ROUTES.HOME, icon: Home, isActive: false, items: [] },
-  { title: "Projects", url: ROUTES.PROJECTS, icon: FolderOpen, isActive: false, items: [] },
   {
-    title: "Marketing prompts",
-    url: ROUTES.MARKETING_PROMPTS,
-    icon: MessageSquare,
-    isActive: false,
-    items: [],
-  },
-  { title: "Platforms", url: ROUTES.PLATFORMS, icon: Globe, isActive: false, items: [] },
-  {
-    title: "Image generations",
+    title: "Generate Assets",
     url: ROUTES.IMAGE_GENERATIONS,
-    icon: ImageIcon,
+    icon: Sparkles,
     isActive: false,
-    items: [],
+    items: [
+      { title: "Generate Video", url: ROUTES.VIDEO_GENERATIONS },
+      { title: "Generate Image", url: ROUTES.IMAGE_GENERATIONS },
+    ],
   },
+  { title: "Upload Assets", url: ROUTES.UPLOAD, icon: Upload, isActive: false, items: [] },
   {
-    title: "Video generations",
-    url: ROUTES.VIDEO_GENERATIONS,
-    icon: Video,
+    title: "Edit AI Builder",
+    url: ROUTES.PLATFORMS,
+    icon: Settings2,
     isActive: false,
-    items: [],
+    items: [
+      { title: "Platforms", url: ROUTES.PLATFORMS },
+      { title: "Marketing Prompts", url: ROUTES.MARKETING_PROMPTS },
+      { title: "Project Prompts", url: ROUTES.PROJECTS },
+    ],
   },
-  { title: "Upload", url: ROUTES.UPLOAD, icon: Upload, isActive: false, items: [] },
 ];
 
 export const SIDEBAR_CONFIG: SidebarConfig[] = SIDEBAR_ITEMS;

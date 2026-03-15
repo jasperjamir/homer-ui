@@ -8,6 +8,21 @@ export type Breadcrumb = {
   onClick?: () => void;
 };
 
+function findSidebarEntry(path: string): { group: (typeof SIDEBAR_CONFIG)[0]; subItem?: { title: string; url: string } } | null {
+  const pathNorm = path.split("?")[0];
+  for (const item of SIDEBAR_CONFIG) {
+    if (item.url === pathNorm && item.items.length === 0) {
+      return { group: item };
+    }
+    for (const sub of item.items) {
+      if (sub.url === pathNorm || pathNorm.startsWith(sub.url + "/")) {
+        return { group: item, subItem: sub };
+      }
+    }
+  }
+  return null;
+}
+
 export function useBreadcrumbs() {
   const location = useLocation();
 
@@ -15,16 +30,22 @@ export function useBreadcrumbs() {
     const path = location.pathname;
     const breadcrumbs: Breadcrumb[] = [{ label: "Home", href: ROUTES.HOME, isHome: true }];
 
-    if (path === ROUTES.HOME || path === "/") {
+    if (path === ROUTES.HOME || path === "/" || path === "/home") {
       return breadcrumbs;
     }
 
-    const groupPath = SIDEBAR_CONFIG[0]?.url.split("?")[0];
-    if (groupPath === path) {
+    const entry = findSidebarEntry(path);
+    if (entry) {
+      if (entry.subItem) {
+        breadcrumbs.push({ label: entry.group.title, href: entry.subItem.url });
+        breadcrumbs.push({ label: entry.subItem.title, href: path });
+      } else {
+        breadcrumbs.push({ label: entry.group.title, href: path });
+      }
       return breadcrumbs;
     }
 
-    breadcrumbs.push({ label: "Overview", href: path });
+    breadcrumbs.push({ label: "Page", href: path });
     return breadcrumbs;
   };
 

@@ -15,7 +15,6 @@ import { Textarea } from "@/Shared/components/ui/textarea";
 import { getMarketingPromptsQueryOptions } from "@/Features/MarketingPrompts/query-options";
 import { getPlatformTypesQueryOptions } from "@/Features/PlatformTypes/query-options";
 import { getProjectsQueryOptions } from "@/Features/Projects/query-options";
-import { getUploadPlatformsQueryOptions } from "@/Features/UploadPlatforms/query-options";
 import type { GenerationFormData } from "@/Features/ImageGenerations/schemas";
 import { generationFormSchema } from "@/Features/ImageGenerations/schemas";
 
@@ -35,7 +34,6 @@ export function GenerationForm({
   const { data: projects = [] } = useQuery(getProjectsQueryOptions());
   const { data: marketingPrompts = [] } = useQuery(getMarketingPromptsQueryOptions());
   const { data: platformTypes = [] } = useQuery(getPlatformTypesQueryOptions());
-  const { data: platforms = [] } = useQuery(getUploadPlatformsQueryOptions());
 
   const form = useForm<GenerationFormData>({
     resolver: zodResolver(generationFormSchema),
