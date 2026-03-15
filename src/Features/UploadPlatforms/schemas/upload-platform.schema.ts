@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PlatformType } from "@/Shared/models/platform.type";
 
 export const uploadPlatformSchema = z.object({
   name: z.string().min(1, "Name is required"),

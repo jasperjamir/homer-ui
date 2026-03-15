@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PlatformType } from "@/Shared/models/platform.type";
 
 export const generationFormSchema = z.object({
   context: z.string().min(1, "Context is required"),
