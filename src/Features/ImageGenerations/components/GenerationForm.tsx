@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/Shared/components/ui/button";
@@ -20,6 +21,7 @@ import {
   generationFormSchema,
   IMAGE_MODEL_LABELS,
   IMAGE_MODELS,
+  SORA_DURATIONS,
   VIDEO_MODEL_LABELS,
   VIDEO_MODELS,
 } from "@/Features/ImageGenerations/schemas";
@@ -61,6 +63,19 @@ export function GenerationForm({
       ...defaultValues,
     },
   });
+
+  const model = form.watch("model");
+  const isSora = modelType === "video" && model === "SORA";
+
+  useEffect(() => {
+    if (!showDurationField) return;
+    const duration = form.getValues("duration") ?? 12;
+    if (isSora && !SORA_DURATIONS.includes(duration as (typeof SORA_DURATIONS)[number])) {
+      form.setValue("duration", 12);
+    } else if (!isSora && duration > 15) {
+      form.setValue("duration", 12);
+    }
+  }, [showDurationField, isSora, form]);
 
   const handleInvalid = (errors: Record<string, { message?: string }>) => {
     const messages = Object.values(errors)
@@ -177,14 +192,19 @@ export function GenerationForm({
           <Field>
             <FieldLabel>Duration</FieldLabel>
             <Select
-              value={String(form.watch("duration") ?? 12)}
+              value={String(
+                (() => {
+                  const d = form.watch("duration") ?? 12;
+                  return isSora && !SORA_DURATIONS.includes(d as (typeof SORA_DURATIONS)[number]) ? 12 : d;
+                })()
+              )}
               onValueChange={(v) => form.setValue("duration", Number(v))}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select duration" />
               </SelectTrigger>
               <SelectContent>
-                {Array.from({ length: 30 }, (_, i) => i + 1).map((n) => (
+                {(isSora ? SORA_DURATIONS : Array.from({ length: 15 }, (_, i) => i + 1)).map((n) => (
                   <SelectItem key={n} value={String(n)}>
                     {n}s
                   </SelectItem>
