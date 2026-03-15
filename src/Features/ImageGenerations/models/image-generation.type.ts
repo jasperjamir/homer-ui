@@ -1,3 +1,5 @@
+import type { PlatformType } from "@/Shared/models/platform.type";
+
 export interface ImageGeneration {
   id: string;
   context: string;

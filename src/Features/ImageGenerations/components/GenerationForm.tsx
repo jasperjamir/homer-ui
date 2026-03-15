@@ -13,8 +13,8 @@ import {
 } from "@/Shared/components/ui/select";
 import { Textarea } from "@/Shared/components/ui/textarea";
 import { getMarketingPromptsQueryOptions } from "@/Features/MarketingPrompts/query-options";
-import { getPlatformTypesQueryOptions } from "@/Features/PlatformTypes/query-options";
 import { getProjectsQueryOptions } from "@/Features/Projects/query-options";
+import { PlatformType } from "@/Shared/models/platform.type";
 import type { GenerationFormData } from "@/Features/ImageGenerations/schemas";
 import { generationFormSchema } from "@/Features/ImageGenerations/schemas";
 
@@ -33,7 +33,6 @@ export function GenerationForm({
 }: GenerationFormProps) {
   const { data: projects = [] } = useQuery(getProjectsQueryOptions());
   const { data: marketingPrompts = [] } = useQuery(getMarketingPromptsQueryOptions());
-  const { data: platformTypes = [] } = useQuery(getPlatformTypesQueryOptions());
 
   const form = useForm<GenerationFormData>({
     resolver: zodResolver(generationFormSchema),
@@ -98,18 +97,15 @@ export function GenerationForm({
       <Field>
         <FieldLabel>Platform type</FieldLabel>
         <Select
-          value={form.watch("platform_type_id") ?? ""}
-          onValueChange={(v) => form.setValue("platform_type_id", v || null)}
+          value={form.watch("platformType") ?? ""}
+          onValueChange={(v) => form.setValue("platformType", (v as "INSTAGRAM" | "TIKTOK") || null)}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Select platform type" />
+            <SelectValue placeholder="INSTAGRAM or TIKTOK" />
           </SelectTrigger>
           <SelectContent>
-            {platformTypes.map((t) => (
-              <SelectItem key={t.id} value={t.id}>
-                {t.name}
-              </SelectItem>
-            ))}
+            <SelectItem value={PlatformType.INSTAGRAM}>INSTAGRAM</SelectItem>
+            <SelectItem value={PlatformType.TIKTOK}>TIKTOK</SelectItem>
           </SelectContent>
         </Select>
       </Field>

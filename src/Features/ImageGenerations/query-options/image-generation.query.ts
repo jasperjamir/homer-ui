@@ -1,5 +1,8 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { CreateImageGenerationRequest } from "@/Features/ImageGenerations/models";
+import type {
+  CreateImageGenerationRequest,
+  ImageGenerationAsset,
+} from "@/Features/ImageGenerations/models";
 import {
   createImageGeneration,
   deleteImageGeneration,
@@ -29,6 +32,23 @@ export function getImageGenerationAssetsQueryOptions(imageGenerationId: string) 
     queryKey: ["image-generation-assets", imageGenerationId],
     queryFn: () => getImageGenerationAssets(imageGenerationId),
     enabled: !!imageGenerationId,
+  });
+}
+
+/** Assets query with polling while asset count < expected assetCount */
+export function getImageGenerationAssetsWithPollingQueryOptions(
+  imageGenerationId: string,
+  expectedAssetCount: number
+) {
+  return queryOptions({
+    queryKey: ["image-generation-assets", imageGenerationId],
+    queryFn: () => getImageGenerationAssets(imageGenerationId),
+    enabled: !!imageGenerationId && expectedAssetCount > 0,
+    refetchInterval: (query) => {
+      const assets = (query.state.data as ImageGenerationAsset[] | undefined) ?? [];
+      if (assets.length >= expectedAssetCount) return false;
+      return 2000; // poll every 2 seconds
+    },
   });
 }
 
