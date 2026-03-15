@@ -64,7 +64,7 @@ export default function HomePage() {
                   <div className="rounded-lg bg-primary/10 p-3 group-hover:bg-primary/20 transition-colors">
                     <Icon className="h-10 w-10 sm:h-14 sm:w-14 text-primary" />
                   </div>
-                  <ChevronRight className="h-6 w-6 shrink-0 text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 transition-all" />
+                  <ChevronRight className="h-6 w-6 shrink-0 text-accent-blue/90 group-hover:text-accent-blue transition-all" />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-semibold mt-2 group-hover:text-primary transition-colors">
                   {title}

@@ -69,7 +69,7 @@ export function NavMain({ items }: { items: SidebarConfig[] }) {
                   <SidebarMenuButton tooltip={item.title} isActive={isGroupActive(item)}>
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
-                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                    <ChevronRight className="ml-auto size-4 text-accent-blue/80 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
@@ -79,7 +79,7 @@ export function NavMain({ items }: { items: SidebarConfig[] }) {
                         <SidebarMenuSubButton
                           asChild
                           isActive={isActiveRoute(subItem.url)}
-                          className="data-[active=true]:bg-transparent data-[active=true]:font-semibold data-[active=true]:text-blue-600"
+                          className="data-[active=true]:bg-transparent data-[active=true]:font-semibold data-[active=true]:text-accent-blue"
                         >
                           <Link to={subItem.url}>
                             <span>{subItem.title}</span>
