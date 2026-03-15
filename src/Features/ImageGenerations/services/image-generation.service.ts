@@ -13,6 +13,7 @@ function toImageGeneration(row: Record<string, unknown>): ImageGeneration {
     projectId: row.project_id as string | null,
     marketingPromptId: row.marketing_prompt_id as string | null,
     platformType: row.platform_type as ImageGeneration["platformType"],
+    model: (row.model as ImageGeneration["model"]) ?? null,
     assetCount: row.asset_count as number,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
@@ -61,6 +62,25 @@ export async function getImageGenerationAssets(
     .order("index", { ascending: true });
   if (error) throw error;
   return (data ?? []).map(toImageGenerationAsset);
+}
+
+/** Returns map of imageGenerationId -> asset count for the given IDs */
+export async function getImageGenerationAssetCounts(
+  imageGenerationIds: string[],
+): Promise<Record<string, number>> {
+  if (imageGenerationIds.length === 0) return {};
+  const { data, error } = await supabase
+    .from("image_generation_assets")
+    .select("image_generation_id")
+    .in("image_generation_id", imageGenerationIds);
+  if (error) throw error;
+  const counts: Record<string, number> = {};
+  for (const id of imageGenerationIds) counts[id] = 0;
+  for (const row of data ?? []) {
+    const id = row.image_generation_id as string;
+    counts[id] = (counts[id] ?? 0) + 1;
+  }
+  return counts;
 }
 
 export async function createImageGeneration(

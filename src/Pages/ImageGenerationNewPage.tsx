@@ -23,6 +23,7 @@ export default function ImageGenerationNewPage() {
       context: data.context,
       platformType: data.platformType ?? null,
       assetCount: data.assetCount,
+      model: data.model ?? "GROK",
     });
   };
 
@@ -40,6 +41,7 @@ export default function ImageGenerationNewPage() {
             onSubmit={handleSubmit}
             isLoading={createMutation.isPending}
             submitLabel="Generate images"
+            showModelField
           />
         </CardContent>
       </Card>

@@ -10,11 +10,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/Shared/components/ui/table";
-import { getVideoGenerationsQueryOptions } from "@/Features/VideoGenerations/query-options";
+import {
+  getVideoGenerationAssetCountsQueryOptions,
+  getVideoGenerationsQueryOptions,
+} from "@/Features/VideoGenerations/query-options";
 import { ROUTES, videoGenerationDetail, videoGenerationStoryboard } from "@/Shared/utils/routes.util";
 
 export default function VideoGenerationsPage() {
   const { data: generations = [], isLoading } = useQuery(getVideoGenerationsQueryOptions());
+  const { data: assetCounts = {} } = useQuery(
+    getVideoGenerationAssetCountsQueryOptions(generations.map((g) => g.id))
+  );
 
   return (
     <div className="space-y-6 p-6">
@@ -54,7 +60,9 @@ export default function VideoGenerationsPage() {
               generations.map((g) => (
                 <TableRow key={g.id}>
                   <TableCell className="max-w-md truncate">{g.context}</TableCell>
-                  <TableCell>{g.assetCount}</TableCell>
+                  <TableCell>
+                    {(assetCounts[g.id] ?? 0)}/{g.assetCount}
+                  </TableCell>
                   <TableCell className="text-muted-foreground text-sm">
                     {new Date(g.createdAt).toLocaleString()}
                   </TableCell>
@@ -63,8 +71,17 @@ export default function VideoGenerationsPage() {
                       <Button variant="ghost" size="sm" asChild>
                         <Link to={videoGenerationStoryboard(g.id)}>Storyboard</Link>
                       </Button>
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link to={videoGenerationDetail(g.id)}>View</Link>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        asChild={(assetCounts[g.id] ?? 0) > 0}
+                        disabled={(assetCounts[g.id] ?? 0) === 0}
+                      >
+                        {(assetCounts[g.id] ?? 0) > 0 ? (
+                          <Link to={videoGenerationDetail(g.id)}>View</Link>
+                        ) : (
+                          <span>View</span>
+                        )}
                       </Button>
                     </div>
                   </TableCell>

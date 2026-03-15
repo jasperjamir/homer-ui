@@ -4,3 +4,8 @@ export const PlatformType = {
 } as const;
 
 export type PlatformType = (typeof PlatformType)[keyof typeof PlatformType];
+
+export const PLATFORM_TYPE_LABELS: Record<PlatformType, string> = {
+  INSTAGRAM: "Instagram",
+  TIKTOK: "Tiktok",
+};

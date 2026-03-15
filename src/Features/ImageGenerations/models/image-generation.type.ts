@@ -6,6 +6,7 @@ export interface ImageGeneration {
   projectId: string | null;
   marketingPromptId: string | null;
   platformType: PlatformType | null;
+  model: "GROK" | "NANO BANANA" | null;
   assetCount: number;
   createdAt: string;
   updatedAt: string;
@@ -31,4 +32,5 @@ export interface CreateImageGenerationRequest {
   context: string;
   platformType: PlatformType | null;
   assetCount: number;
+  model: "GROK" | "NANO BANANA";
 }

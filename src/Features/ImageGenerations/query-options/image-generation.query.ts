@@ -6,6 +6,7 @@ import type {
 import {
   createImageGeneration,
   deleteImageGeneration,
+  getImageGenerationAssetCounts,
   getImageGenerationAssets,
   getImageGenerationById,
   getImageGenerations,
@@ -15,6 +16,15 @@ export function getImageGenerationsQueryOptions() {
   return queryOptions({
     queryKey: ["image-generations"],
     queryFn: getImageGenerations,
+    staleTime: 1000 * 30,
+  });
+}
+
+export function getImageGenerationAssetCountsQueryOptions(imageGenerationIds: string[]) {
+  return queryOptions({
+    queryKey: ["image-generation-asset-counts", imageGenerationIds.sort().join(",")],
+    queryFn: () => getImageGenerationAssetCounts(imageGenerationIds),
+    enabled: imageGenerationIds.length > 0,
     staleTime: 1000 * 30,
   });
 }
@@ -63,6 +73,7 @@ export function useCreateImageGenerationMutation(options?: {
       qc.invalidateQueries({ queryKey: ["image-generations"] });
       qc.invalidateQueries({ queryKey: ["image-generation", data.id] });
       qc.invalidateQueries({ queryKey: ["image-generation-assets", data.id] });
+      qc.invalidateQueries({ queryKey: ["image-generation-asset-counts"] });
       options?.onSuccess?.(data.id);
     },
     onError: options?.onError,

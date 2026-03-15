@@ -10,11 +10,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/Shared/components/ui/table";
-import { getImageGenerationsQueryOptions } from "@/Features/ImageGenerations/query-options";
+import {
+  getImageGenerationAssetCountsQueryOptions,
+  getImageGenerationsQueryOptions,
+} from "@/Features/ImageGenerations/query-options";
 import { ROUTES, imageGenerationDetail } from "@/Shared/utils/routes.util";
 
 export default function ImageGenerationsPage() {
   const { data: generations = [], isLoading } = useQuery(getImageGenerationsQueryOptions());
+  const { data: assetCounts = {} } = useQuery(
+    getImageGenerationAssetCountsQueryOptions(generations.map((g) => g.id))
+  );
 
   return (
     <div className="space-y-6 p-6">
@@ -54,7 +60,9 @@ export default function ImageGenerationsPage() {
               generations.map((g) => (
                 <TableRow key={g.id}>
                   <TableCell className="max-w-md truncate">{g.context}</TableCell>
-                  <TableCell>{g.assetCount}</TableCell>
+                  <TableCell>
+                    {(assetCounts[g.id] ?? 0)}/{g.assetCount}
+                  </TableCell>
                   <TableCell className="text-muted-foreground text-sm">
                     {new Date(g.createdAt).toLocaleString()}
                   </TableCell>

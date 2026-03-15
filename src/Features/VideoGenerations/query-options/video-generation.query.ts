@@ -8,6 +8,7 @@ import {
   createVideoStoryboard,
   deleteVideoGeneration,
   generateVideoFromStoryboard,
+  getVideoGenerationAssetCounts,
   getVideoGenerationAssets,
   getVideoGenerationById,
   getVideoGenerationStoryboard,
@@ -19,6 +20,15 @@ export function getVideoGenerationsQueryOptions() {
   return queryOptions({
     queryKey: ["video-generations"],
     queryFn: getVideoGenerations,
+    staleTime: 1000 * 30,
+  });
+}
+
+export function getVideoGenerationAssetCountsQueryOptions(videoGenerationIds: string[]) {
+  return queryOptions({
+    queryKey: ["video-generation-asset-counts", videoGenerationIds.sort().join(",")],
+    queryFn: () => getVideoGenerationAssetCounts(videoGenerationIds),
+    enabled: videoGenerationIds.length > 0,
     staleTime: 1000 * 30,
   });
 }
@@ -107,6 +117,7 @@ export function useGenerateVideoFromStoryboardMutation(options?: {
       generateVideoFromStoryboard(input),
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: ["video-generation-assets", variables.videoGenerationId] });
+      qc.invalidateQueries({ queryKey: ["video-generation-asset-counts"] });
       options?.onSuccess?.();
     },
     onError: options?.onError,

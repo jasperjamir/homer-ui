@@ -13,8 +13,10 @@ import {
   getImageGenerationAssetsWithPollingQueryOptions,
   getImageGenerationQueryOptions,
 } from "@/Features/ImageGenerations/query-options";
-import { PlatformType } from "@/Shared/models/platform.type";
-import { ROUTES, uploadWithGenerationId } from "@/Shared/utils/routes.util";
+import { Badge } from "@/Shared/components/ui/badge";
+import { IMAGE_MODEL_LABELS } from "@/Features/ImageGenerations/schemas";
+import { PlatformType, PLATFORM_TYPE_LABELS } from "@/Shared/models/platform.type";
+import { ROUTES, uploadWithGenerationId} from "@/Shared/utils/routes.util";
 
 /** Aspect ratio classes: Instagram 4:5, TikTok 9:16 */
 function getAspectClass(platformType: PlatformType | null): string {
@@ -67,8 +69,18 @@ export default function ImageGenerationDetailPage() {
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>Context</CardTitle>
-          <p className="text-muted-foreground text-sm">{generation.context}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <CardTitle className="mb-0">Context</CardTitle>
+            {generation.platformType && (
+              <Badge variant="secondary">
+                {PLATFORM_TYPE_LABELS[generation.platformType]}
+              </Badge>
+            )}
+            {generation.model && (
+              <Badge variant="outline">{IMAGE_MODEL_LABELS[generation.model]}</Badge>
+            )}
+          </div>
+          <p className="text-muted-foreground text-sm mt-2">{generation.context}</p>
         </CardHeader>
       </Card>
       <Card>

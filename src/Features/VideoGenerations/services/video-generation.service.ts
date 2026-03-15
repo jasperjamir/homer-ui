@@ -103,6 +103,25 @@ export async function getVideoGenerationAssets(
   return (data ?? []).map(toVideoGenerationAsset);
 }
 
+/** Returns map of videoGenerationId -> asset count for the given IDs */
+export async function getVideoGenerationAssetCounts(
+  videoGenerationIds: string[],
+): Promise<Record<string, number>> {
+  if (videoGenerationIds.length === 0) return {};
+  const { data, error } = await supabase
+    .from("video_generation_assets")
+    .select("video_generation_id")
+    .in("video_generation_id", videoGenerationIds);
+  if (error) throw error;
+  const counts: Record<string, number> = {};
+  for (const id of videoGenerationIds) counts[id] = 0;
+  for (const row of data ?? []) {
+    const id = row.video_generation_id as string;
+    counts[id] = (counts[id] ?? 0) + 1;
+  }
+  return counts;
+}
+
 export async function createVideoStoryboard(
   input: CreateVideoStoryboardRequest,
 ): Promise<VideoGeneration> {

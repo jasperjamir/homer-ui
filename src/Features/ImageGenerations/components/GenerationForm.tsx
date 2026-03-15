@@ -14,15 +14,17 @@ import {
 import { Textarea } from "@/Shared/components/ui/textarea";
 import { getMarketingPromptsQueryOptions } from "@/Features/MarketingPrompts/query-options";
 import { getProjectsQueryOptions } from "@/Features/Projects/query-options";
-import { PlatformType } from "@/Shared/models/platform.type";
+import { PlatformType, PLATFORM_TYPE_LABELS } from "@/Shared/models/platform.type";
 import type { GenerationFormData } from "@/Features/ImageGenerations/schemas";
-import { generationFormSchema } from "@/Features/ImageGenerations/schemas";
+import { generationFormSchema, IMAGE_MODEL_LABELS, IMAGE_MODELS } from "@/Features/ImageGenerations/schemas";
 
 interface GenerationFormProps {
   defaultValues?: Partial<GenerationFormData>;
   onSubmit: (data: GenerationFormData) => void;
   isLoading?: boolean;
   submitLabel?: string;
+  /** Show model dropdown (for image generation) */
+  showModelField?: boolean;
 }
 
 export function GenerationForm({
@@ -30,6 +32,7 @@ export function GenerationForm({
   onSubmit,
   isLoading = false,
   submitLabel = "Generate",
+  showModelField = false,
 }: GenerationFormProps) {
   const { data: projects = [] } = useQuery(getProjectsQueryOptions());
   const { data: marketingPrompts = [] } = useQuery(getMarketingPromptsQueryOptions());
@@ -42,6 +45,7 @@ export function GenerationForm({
       marketingPromptId: null,
       platformType: null,
       assetCount: 5,
+      model: "GROK",
       ...defaultValues,
     },
   });
@@ -101,14 +105,34 @@ export function GenerationForm({
           onValueChange={(v) => form.setValue("platformType", (v as "INSTAGRAM" | "TIKTOK") || null)}
         >
           <SelectTrigger>
-            <SelectValue placeholder="INSTAGRAM or TIKTOK" />
+            <SelectValue placeholder="Instagram or Tiktok" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={PlatformType.INSTAGRAM}>INSTAGRAM</SelectItem>
-            <SelectItem value={PlatformType.TIKTOK}>TIKTOK</SelectItem>
+            <SelectItem value={PlatformType.INSTAGRAM}>{PLATFORM_TYPE_LABELS.INSTAGRAM}</SelectItem>
+            <SelectItem value={PlatformType.TIKTOK}>{PLATFORM_TYPE_LABELS.TIKTOK}</SelectItem>
           </SelectContent>
         </Select>
       </Field>
+      {showModelField && (
+        <Field>
+          <FieldLabel>Model</FieldLabel>
+          <Select
+            value={form.watch("model") ?? "GROK"}
+            onValueChange={(v) => form.setValue("model", (v as "GROK" | "NANO BANANA") ?? "GROK")}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select model" />
+            </SelectTrigger>
+            <SelectContent>
+              {IMAGE_MODELS.map((m) => (
+                <SelectItem key={m} value={m}>
+                  {IMAGE_MODEL_LABELS[m]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
+      )}
       <Field>
         <FieldLabel>Number of assets (1–10)</FieldLabel>
         <Input
