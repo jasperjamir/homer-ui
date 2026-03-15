@@ -100,7 +100,7 @@ export default function HomePage() {
         <CardHeader className="pb-2">
           <h2 className="text-lg font-semibold">Generate assets using the three-step process</h2>
           <p className="text-muted-foreground text-sm mt-0.5">
-            IDEATE → VALIDATE → LAUNCH. Create images or videos above to begin.
+            Ideate → Validate → Launch. Create images or videos above to begin.
           </p>
         </CardHeader>
         <CardContent className="pt-0">
