@@ -86,6 +86,9 @@ export function useDeleteImageGenerationMutation(options?: { onSuccess?: () => v
     mutationFn: (id: string) => deleteImageGeneration(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["image-generations"] });
+      qc.invalidateQueries({ queryKey: ["image-generation-asset-counts"] });
+      qc.invalidateQueries({ queryKey: ["image-generation-assets"] });
+      qc.invalidateQueries({ queryKey: ["upload-assets"] });
       options?.onSuccess?.();
     },
   });

@@ -139,6 +139,16 @@ export async function generateVideoFromStoryboard(
 }
 
 export async function deleteVideoGeneration(id: string): Promise<void> {
+  const { error: assetsError } = await supabase
+    .from("video_generation_assets")
+    .delete()
+    .eq("video_generation_id", id);
+  if (assetsError) throw assetsError;
+  const { error: storyboardError } = await supabase
+    .from("video_generation_storyboards")
+    .delete()
+    .eq("video_generation_id", id);
+  if (storyboardError) throw storyboardError;
   const { error } = await supabase.from("video_generations").delete().eq("id", id);
   if (error) throw error;
 }

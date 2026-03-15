@@ -91,6 +91,11 @@ export async function createImageGeneration(
 }
 
 export async function deleteImageGeneration(id: string): Promise<void> {
+  const { error: assetsError } = await supabase
+    .from("image_generation_assets")
+    .delete()
+    .eq("image_generation_id", id);
+  if (assetsError) throw assetsError;
   const { error } = await supabase.from("image_generations").delete().eq("id", id);
   if (error) throw error;
 }

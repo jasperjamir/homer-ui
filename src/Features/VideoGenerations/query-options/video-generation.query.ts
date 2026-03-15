@@ -142,6 +142,10 @@ export function useDeleteVideoGenerationMutation(options?: { onSuccess?: () => v
     mutationFn: (id: string) => deleteVideoGeneration(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["video-generations"] });
+      qc.invalidateQueries({ queryKey: ["video-generation-asset-counts"] });
+      qc.invalidateQueries({ queryKey: ["video-generation-assets"] });
+      qc.invalidateQueries({ queryKey: ["video-generation-storyboard"] });
+      qc.invalidateQueries({ queryKey: ["upload-assets"] });
       options?.onSuccess?.();
     },
   });
