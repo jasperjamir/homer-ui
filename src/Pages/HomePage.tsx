@@ -1,72 +1,78 @@
 import { Link } from "react-router";
-import { Card, CardContent, CardHeader, CardTitle } from "@/Shared/components/ui/card";
 import { Button } from "@/Shared/components/ui/button";
-import { ArrowRight, ImageIcon, Video, Upload, Settings2 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/Shared/components/ui/dropdown-menu";
+import { ImageIcon, Video, Upload, Settings2 } from "lucide-react";
 import { ROUTES } from "@/Shared/utils/routes.util";
 
 export default function HomePage() {
   return (
-    <div className="p-6 space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold">Home</h1>
-        <p className="text-muted-foreground text-sm">
-          Generate assets, then upload. Or edit your AI builder config.
-        </p>
-      </div>
-      <div className="grid gap-6 sm:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              Generate → Upload
-            </CardTitle>
-            <p className="text-muted-foreground text-sm">
-              Create image or video assets, then upload them to platforms.
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Button variant="outline" size="sm" className="w-full justify-start" asChild>
-              <Link to={ROUTES.VIDEO_GENERATIONS_NEW}>
-                <Video className="mr-2 h-4 w-4" />
-                Generate Video
-              </Link>
+    <div className="p-6 space-y-10">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold">Home</h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            Generate assets, then upload to your platforms.
+          </p>
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="shrink-0" title="Edit AI Builder">
+              <Settings2 className="h-5 w-5" />
             </Button>
-            <Button variant="outline" size="sm" className="w-full justify-start" asChild>
-              <Link to={ROUTES.IMAGE_GENERATIONS_NEW}>
-                <ImageIcon className="mr-2 h-4 w-4" />
-                Generate Image
-              </Link>
-            </Button>
-            <Button variant="secondary" size="sm" className="w-full justify-start" asChild>
-              <Link to={ROUTES.UPLOAD}>
-                <Upload className="mr-2 h-4 w-4" />
-                Upload Assets
-                <ArrowRight className="ml-auto h-4 w-4" />
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Settings2 className="h-4 w-4" />
-              Edit AI Builder
-            </CardTitle>
-            <p className="text-muted-foreground text-sm">
-              Configure platforms, marketing prompts, and project prompts.
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem asChild>
               <Link to={ROUTES.PLATFORMS}>Platforms</Link>
-            </Button>
-            <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
               <Link to={ROUTES.MARKETING_PROMPTS}>Marketing Prompts</Link>
-            </Button>
-            <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
               <Link to={ROUTES.PROJECTS}>Project Prompts</Link>
-            </Button>
-          </CardContent>
-        </Card>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      <div className="grid gap-6 sm:grid-cols-3">
+        <Button
+          variant="default"
+          size="lg"
+          className="h-28 sm:h-32 text-lg font-semibold flex flex-col gap-2"
+          asChild
+        >
+          <Link to={ROUTES.IMAGE_GENERATIONS_NEW}>
+            <ImageIcon className="h-10 w-10 sm:h-12 sm:w-12" />
+            Generate Images
+          </Link>
+        </Button>
+        <Button
+          variant="default"
+          size="lg"
+          className="h-28 sm:h-32 text-lg font-semibold flex flex-col gap-2"
+          asChild
+        >
+          <Link to={ROUTES.VIDEO_GENERATIONS_NEW}>
+            <Video className="h-10 w-10 sm:h-12 sm:w-12" />
+            Generate Videos
+          </Link>
+        </Button>
+        <Button
+          variant="default"
+          size="lg"
+          className="h-28 sm:h-32 text-lg font-semibold flex flex-col gap-2"
+          asChild
+        >
+          <Link to={ROUTES.UPLOAD}>
+            <Upload className="h-10 w-10 sm:h-12 sm:w-12" />
+            Upload Images or Videos
+          </Link>
+        </Button>
       </div>
     </div>
   );
