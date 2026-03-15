@@ -137,25 +137,28 @@ export default function UploadPage() {
     }
   };
 
-  const imageGenId = isGenerationFilter && !isVideoGenerationFilter ? filterValue : null;
-  const videoGenId = isVideoGenerationFilter ? filterValue.replace(/^video:/, "") : null;
   const uploadJourneySteps = isVideoGenerationFilter
-    ? getVideoJourneySteps({ videoGenerationId: videoGenId })
-    : getImageJourneySteps({ imageGenerationId: imageGenId });
+    ? getVideoJourneySteps()
+    : getImageJourneySteps();
   const uploadJourneyCurrentIndex = isVideoGenerationFilter ? 3 : 2;
 
   return (
     <div className="space-y-6 p-6">
-      <h1 className="text-2xl font-semibold">LAUNCH</h1>
-      <p className="text-muted-foreground text-sm max-w-2xl">
-        {uploadJourneySteps[uploadJourneyCurrentIndex].description}
-      </p>
-
-      <JourneyStepper steps={uploadJourneySteps} currentStepIndex={uploadJourneyCurrentIndex} />
-
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold">Launch</h1>
+          <p className="text-muted-foreground text-sm mt-1 max-w-2xl">
+            {uploadJourneySteps[uploadJourneyCurrentIndex].description}
+          </p>
+        </div>
+        <JourneyStepper steps={uploadJourneySteps} currentStepIndex={uploadJourneyCurrentIndex} />
+      </div>
+      <div className="flex flex-col items-center">
+        <div className="w-full max-w-5xl">
       <Card>
-        <CardHeader>
-          <div className="flex items-center gap-4 pt-2 flex-wrap">
+        <CardHeader className="space-y-2">
+          <div className="flex flex-wrap items-center justify-start gap-4">
+            <CardTitle className="mb-0">Select assets to publish</CardTitle>
             <Select value={filterValue} onValueChange={handleFilterChange}>
               <SelectTrigger className="w-[220px]">
                 <SelectValue placeholder="Filter" />
@@ -262,6 +265,7 @@ export default function UploadPage() {
                           <Checkbox
                             checked={checked.has(key(asset, p.id))}
                             onCheckedChange={() => toggle(asset, p.id)}
+                            aria-label={`Select ${asset.type} #${asset.index} for ${p.name}`}
                           />
                         </TableCell>
                       ))}
@@ -288,6 +292,8 @@ export default function UploadPage() {
           )}
         </CardContent>
       </Card>
+        </div>
+      </div>
     </div>
   );
 }

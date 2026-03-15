@@ -1,11 +1,9 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useParams, Link } from "react-router";
+import { useParams } from "react-router";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Shared/components/ui/card";
-import { Separator } from "@/Shared/components/ui/separator";
 import { Button } from "@/Shared/components/ui/button";
-import { ArrowLeft } from "lucide-react";
 import {
   getVideoGenerationAssetsQueryOptions,
   getVideoGenerationQueryOptions,
@@ -20,7 +18,7 @@ import {
 } from "@/Features/VideoGenerations/models";
 import { useNavigate } from "react-router";
 import { JourneyStepper, getVideoJourneySteps } from "@/Shared/components/JourneyStepper";
-import { ROUTES, videoGenerationDetail } from "@/Shared/utils/routes.util";
+import { videoGenerationDetail } from "@/Shared/utils/routes.util";
 
 export default function VideoGenerationStoryboardPage() {
   const { id } = useParams<{ id: string }>();
@@ -88,38 +86,29 @@ export default function VideoGenerationStoryboardPage() {
   if (!id) return <div className="p-6">Missing generation ID</div>;
   if (genLoading || !generation) return <div className="p-6">Generating...</div>;
 
-  const steps = getVideoJourneySteps({ videoGenerationId: id });
+  const steps = getVideoJourneySteps();
   return (
     <div className="space-y-6 p-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link to={ROUTES.VIDEO_GENERATIONS}>
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">VALIDATE (2.1)</h1>
+          <h1 className="text-2xl font-semibold">Validate</h1>
           <p className="text-muted-foreground text-sm mt-1">Validate and edit your storyboard before generating videos.</p>
         </div>
+        <JourneyStepper steps={steps} currentStepIndex={1} />
       </div>
-      <JourneyStepper steps={steps} currentStepIndex={1} />
+      <div className="flex flex-col items-center">
+        <div className="w-full max-w-5xl">
       <Card>
-        <CardHeader>
-          <CardTitle>Storyboard</CardTitle>
-          <p className="text-muted-foreground text-sm mt-2">
+        <CardHeader className="space-y-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <CardTitle className="mb-0">Storyboard</CardTitle>
+          </div>
+          <p className="text-muted-foreground text-sm">
             {hasGeneratedVideo
               ? "Video has been generated from this storyboard. The storyboard is read-only."
               : "Edit each frame below, then click Save storyboard and generate video."}
           </p>
         </CardHeader>
-        {steps[1].context && (
-          <>
-            <Separator />
-            <CardContent className="pt-4">
-              <p className="text-muted-foreground text-sm">{steps[1].context}</p>
-            </CardContent>
-          </>
-        )}
         <CardContent className="space-y-4">
           {sbLoading || !storyboard ? (
             <div className="flex min-h-[200px] flex-col items-center justify-center gap-2 text-muted-foreground">
@@ -145,6 +134,8 @@ export default function VideoGenerationStoryboardPage() {
           ) : null}
         </CardContent>
       </Card>
+        </div>
+      </div>
     </div>
   );
 }

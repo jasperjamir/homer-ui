@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "react-router";
 import { MediaPreviewDialog } from "@/Shared/components/MediaPreviewDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Shared/components/ui/card";
-import { Separator } from "@/Shared/components/ui/separator";
 import { Button } from "@/Shared/components/ui/button";
 import { Skeleton } from "@/Shared/components/ui/skeleton";
 import { VideoOff } from "lucide-react";
@@ -11,9 +10,6 @@ import {
   getVideoGenerationAssetsWithPollingQueryOptions,
   getVideoGenerationQueryOptions,
 } from "@/Features/VideoGenerations/query-options";
-import { Badge } from "@/Shared/components/ui/badge";
-import { VIDEO_MODEL_LABELS } from "@/Features/ImageGenerations/schemas";
-import { PLATFORM_TYPE_LABELS } from "@/Shared/models/platform.type";
 import { JourneyStepper, getVideoJourneySteps } from "@/Shared/components/JourneyStepper";
 import { uploadWithVideoGenerationId } from "@/Shared/utils/routes.util";
 
@@ -50,82 +46,56 @@ export default function VideoGenerationDetailPage() {
   if (!id) return <div className="p-6">Missing generation ID</div>;
   if (genLoading || !generation) return <div className="p-6">Generating...</div>;
 
-  const steps = getVideoJourneySteps({ videoGenerationId: id });
+  const steps = getVideoJourneySteps();
   return (
     <div className="space-y-6 p-6">
-      <div>
-        <h1 className="text-2xl font-semibold">VALIDATE (2.2)</h1>
-        <p className="text-muted-foreground text-sm mt-1">Review and validate your generated videos.</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold">Validate</h1>
+          <p className="text-muted-foreground text-sm mt-1">Review and validate your generated videos.</p>
+        </div>
+        <JourneyStepper steps={steps} currentStepIndex={2} />
       </div>
-      <JourneyStepper steps={steps} currentStepIndex={2} />
-      <Card>
-        <CardHeader>
-          <div className="flex flex-wrap items-center gap-2">
-            <CardTitle className="mb-0">Context</CardTitle>
-            {generation.platformType && (
-              <Badge variant="secondary">
-                {PLATFORM_TYPE_LABELS[generation.platformType]}
-              </Badge>
-            )}
-            {generation.model && (
-              <Badge variant="outline">{VIDEO_MODEL_LABELS[generation.model]}</Badge>
-            )}
+      <div className="flex flex-col items-center">
+        <div className="w-full max-w-5xl space-y-6">
+      <Card className="border-0 shadow-none">
+        <CardHeader className="space-y-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <CardTitle className="mb-0">Video links</CardTitle>
+            <span className="font-medium tabular-nums text-sm">
+              {assets.length}/{generation.assetCount}
+            </span>
           </div>
-        </CardHeader>
-        {(steps[2].context || generation.context) && (
-          <>
-            <Separator />
-            <CardContent className="pt-4 space-y-2">
-              {steps[2].context && (
-                <p className="text-muted-foreground text-sm">{steps[2].context}</p>
-              )}
-              {generation.context && (
-                <p className="text-muted-foreground text-sm">{generation.context}</p>
-              )}
-            </CardContent>
-          </>
-        )}
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Video links</CardTitle>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between gap-2 text-sm">
-              <span className="text-muted-foreground">
-                {assets.length < generation.assetCount
-                  ? "Generating…"
-                  : "Use the Upload page to map these to platforms."}
-              </span>
-              <span className="font-medium tabular-nums">
-                {assets.length}/{generation.assetCount}
-              </span>
-            </div>
-            <div
-              className="flex gap-1"
-              role="progressbar"
-              aria-valuenow={assets.length}
-              aria-valuemin={0}
-              aria-valuemax={generation.assetCount}
-              aria-label={`${assets.length} of ${generation.assetCount} assets ready`}
-            >
-              {Array.from({ length: generation.assetCount }, (_, i) => {
-                const isComplete = i < assets.length;
-                const isInProgress =
-                  i === assets.length && assets.length < generation.assetCount;
-                return (
-                  <div
-                    key={i}
-                    className={`h-2 flex-1 rounded-full transition-colors ${
-                      isComplete
-                        ? "bg-primary"
-                        : isInProgress
-                          ? "animate-pulse bg-primary/50"
-                          : "bg-primary/20"
-                    }`}
-                  />
-                );
-              })}
-            </div>
+          <p className="text-muted-foreground text-sm">
+            {assets.length < generation.assetCount
+              ? "Generating…"
+              : "Use the Upload page to map these to platforms."}
+          </p>
+          <div
+            className="flex gap-1"
+            role="progressbar"
+            aria-valuenow={assets.length}
+            aria-valuemin={0}
+            aria-valuemax={generation.assetCount}
+            aria-label={`${assets.length} of ${generation.assetCount} assets ready`}
+          >
+            {Array.from({ length: generation.assetCount }, (_, i) => {
+              const isComplete = i < assets.length;
+              const isInProgress =
+                i === assets.length && assets.length < generation.assetCount;
+              return (
+                <div
+                  key={i}
+                  className={`h-1 flex-1 rounded-full transition-colors ${
+                    isComplete
+                      ? "bg-primary/50"
+                      : isInProgress
+                        ? "animate-pulse bg-primary/35"
+                        : "bg-primary/15"
+                  }`}
+                />
+              );
+            })}
           </div>
         </CardHeader>
         <CardContent>
@@ -210,8 +180,10 @@ export default function VideoGenerationDetailPage() {
       </Card>
       <div className="flex gap-2">
         <Button asChild>
-          <Link to={uploadWithVideoGenerationId(id)}>Go to Upload (map to platforms)</Link>
+          <Link to={uploadWithVideoGenerationId(id)}>Upload videos</Link>
         </Button>
+      </div>
+        </div>
       </div>
     </div>
   );

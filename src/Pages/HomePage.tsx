@@ -12,17 +12,17 @@ import { ROUTES } from "@/Shared/utils/routes.util";
 
 const PROCESS_STEPS = [
   {
-    label: "IDEATE",
+    label: "Ideate",
     number: "1",
     description: "Provide the AI with the context it needs to create strong content.",
   },
   {
-    label: "VALIDATE",
+    label: "Validate",
     number: "2",
     description: "Review the AI output before publishing. Ensure the message is clear and matches your brand.",
   },
   {
-    label: "LAUNCH",
+    label: "Launch",
     number: "3",
     description: "Publish it to your chosen platform.",
   },

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/Shared/components/ui/card";
+import { Card, CardContent } from "@/Shared/components/ui/card";
 import { JourneyStepper, getImageJourneySteps } from "@/Shared/components/JourneyStepper";
 import { GenerationForm } from "@/Features/ImageGenerations/components";
 import { useCreateImageGenerationMutation } from "@/Features/ImageGenerations/query-options";
@@ -28,20 +28,19 @@ export default function ImageGenerationNewPage() {
     });
   };
 
-  const steps = getImageJourneySteps({});
+  const steps = getImageJourneySteps();
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-6">
-      <Card className="w-full max-w-2xl">
-        <CardHeader className="space-y-4">
-          <div>
-            <CardTitle>IDEATE</CardTitle>
-            <p className="text-muted-foreground text-sm mt-1">
-              {steps[0].description}
-            </p>
-          </div>
-          <JourneyStepper steps={steps} currentStepIndex={0} />
-        </CardHeader>
-        <CardContent>
+    <div className="flex min-h-[calc(100vh-4rem)] flex-col p-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold">Ideate</h1>
+          <p className="text-muted-foreground text-sm mt-1">{steps[0].description}</p>
+        </div>
+        <JourneyStepper steps={steps} currentStepIndex={0} />
+      </div>
+      <div className="flex flex-1 flex-col items-center justify-center">
+        <Card className="w-full max-w-2xl mt-6">
+          <CardContent className="pt-6">
           <GenerationForm
             onSubmit={handleSubmit}
             isLoading={createMutation.isPending}
@@ -49,8 +48,9 @@ export default function ImageGenerationNewPage() {
             showModelField
             modelType="image"
           />
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
