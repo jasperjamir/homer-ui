@@ -22,7 +22,6 @@ import {
 } from "@/Shared/components/ui/table";
 import { getImageGenerationsQueryOptions } from "@/Features/ImageGenerations/query-options";
 import { getUploadPlatformsQueryOptions } from "@/Features/UploadPlatforms/query-options";
-import { useSaveMappingsMutation } from "@/Features/Upload/query-options";
 import type { PoolAsset } from "@/Features/Upload/models";
 import { getAssetsInRange } from "@/Features/Upload/services";
 
@@ -78,12 +77,6 @@ export default function UploadPage() {
   const { data: platforms = [], isLoading: platformsLoading } = useQuery(
     getUploadPlatformsQueryOptions()
   );
-  const saveMutation = useSaveMappingsMutation({
-    onSuccess: () => {
-      toast.success("Mappings saved");
-    },
-    onError: (e) => toast.error(e.message),
-  });
 
   const isGenerationFilter = filterValue && !TIME_FILTER_OPTIONS.some((o) => o.value === filterValue);
 
@@ -97,15 +90,9 @@ export default function UploadPage() {
     });
   };
 
-  const handleSave = () => {
-    const image: Array<{ image_generation_asset_id: string; upload_platform_id: string }> = [];
-    const video: Array<{ video_generation_asset_id: string; upload_platform_id: string }> = [];
-    checked.forEach((k) => {
-      const [type, assetId, platformId] = k.split(":");
-      if (type === "image") image.push({ image_generation_asset_id: assetId, upload_platform_id: platformId });
-      if (type === "video") video.push({ video_generation_asset_id: assetId, upload_platform_id: platformId });
-    });
-    saveMutation.mutate({ image, video });
+  const handleUpload = () => {
+    const count = checked.size;
+    toast.success(`Finished uploading ${count} item${count === 1 ? "" : "s"} to your platforms`);
   };
 
   return (
@@ -140,9 +127,6 @@ export default function UploadPage() {
                 )}
               </SelectContent>
             </Select>
-            <Button onClick={handleSave} disabled={saveMutation.isPending || checked.size === 0}>
-              {saveMutation.isPending ? "Saving…" : "Save mappings"}
-            </Button>
           </div>
         </CardHeader>
         <CardContent>
@@ -202,6 +186,13 @@ export default function UploadPage() {
                   ))}
                 </TableBody>
               </Table>
+            </div>
+          )}
+          {assets.length > 0 && (
+            <div className="mt-4">
+              <Button onClick={handleUpload} disabled={checked.size === 0}>
+                Upload
+              </Button>
             </div>
           )}
         </CardContent>
