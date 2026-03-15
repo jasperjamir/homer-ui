@@ -1,2 +1,13 @@
 export { default as HomePage } from "./HomePage";
 export { default as LoginPage } from "./LoginPage";
+export { default as ProjectsPage } from "./ProjectsPage";
+export { default as MarketingPromptsPage } from "./MarketingPromptsPage";
+export { default as PlatformsPage } from "./PlatformsPage";
+export { default as ImageGenerationsPage } from "./ImageGenerationsPage";
+export { default as ImageGenerationNewPage } from "./ImageGenerationNewPage";
+export { default as ImageGenerationDetailPage } from "./ImageGenerationDetailPage";
+export { default as VideoGenerationsPage } from "./VideoGenerationsPage";
+export { default as VideoGenerationNewPage } from "./VideoGenerationNewPage";
+export { default as VideoGenerationStoryboardPage } from "./VideoGenerationStoryboardPage";
+export { default as VideoGenerationDetailPage } from "./VideoGenerationDetailPage";
+export { default as UploadPage } from "./UploadPage";

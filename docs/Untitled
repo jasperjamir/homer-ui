@@ -1,0 +1,236 @@
+Video & Image App – Fully Decoupled + MVP Mocks
+
+Three separate flows
+
+Image (1 step)  
+
+
+
+
+
+Step 1: Generate Image Links – Prompt (context + project + marketing) → output = image asset links.
+
+Video (2 steps)  
+
+
+
+
+
+Step 1: Generate Storyboard – Prompt → output = storyboard.  
+
+
+
+Step 2: Generate Video from Storyboard – Storyboard → output = video asset links.
+
+Upload (1 step)  
+
+
+
+
+
+Step 1: Upload Assets – Choose assets from pool + choose platform(s) → save mapping.
+
+Asset pool = all asset links: both image links (image_generation_assets.asset_url) and video links (video_generation_assets.asset_url). Upload treats them the same (choose any assets, map to platforms).
+
+
+
+MVP: mock data (replace with real later)
+
+Mock image links  
+
+
+
+
+
+When user completes “Generate Image Links”, do not call any AI.  
+
+
+
+Create image_generation + N image_generation_assets rows and set each asset_url to a mock link (e.g. placeholder image URL, or deterministic mock like https://picsum.photos/seed/{generation_id}_{index} or a fixed placeholder).  
+
+
+
+Later: replace this with real API that returns image links.
+
+Mock storyboards  
+
+
+
+
+
+When user completes “Generate Storyboard” (Video Step 1), do not call any AI.  
+
+
+
+Create/update video_generation_storyboards.content with mock storyboard data (e.g. default JSON: { "frames": [ { "scene": "Scene 1", "description": "..." }, ... ] } or a few sample frames).  
+
+
+
+Later: replace with real storyboard generation.
+
+Video links (mock for MVP)  
+
+
+
+
+
+When user runs “Generate Video from Storyboard” (Video Step 2), do not call any AI.  
+
+
+
+Set video_generation_assets.asset_url to mock video links (e.g. placeholder video URL or sample mp4).  
+
+
+
+Later: replace with real video-from-storyboard API.
+
+So in MVP the asset pool is populated with: mock image links + mock video links. Upload step lists all of them (with optional filter, e.g. last hour) and user chooses assets + platforms.
+
+
+
+Flow diagram
+
+flowchart TB
+  subgraph Image[Image]
+    I1[Step 1: Generate Image Links - mock links]
+  end
+  subgraph Video[Video]
+    V1[Step 1: Generate Storyboard - mock storyboard]
+    V2[Step 2: Generate Video - mock video links]
+    V1 --> V2
+  end
+  subgraph Pool[Asset pool]
+    P[(All asset links: image + video)]
+  end
+  subgraph Upload[Upload]
+    U1[Step 1: Choose Assets + Choose Platforms]
+  end
+  I1 --> P
+  V2 --> P
+  P --> U1
+
+
+
+Data model (unchanged)
+
+
+
+
+
+image_generation_assets – asset_url (mock or real image link).  
+
+
+
+video_generation_assets – asset_url (mock or real video link).  
+
+
+
+video_generation_storyboards – content (mock or real storyboard jsonb).  
+
+
+
+Upload reads from both asset tables; asset pool = union of all rows with asset_url (and optional time filter).
+
+
+
+Implementation notes
+
+
+
+
+
+Image flow: On submit, create generation + N asset rows; fill asset_url with mock image URLs (e.g. picsum or static placeholder).  
+
+
+
+Video Step 1: On submit, create video_generation + storyboard row with mock content; editor can load/edit it.  
+
+
+
+Video Step 2: “Generate Video” button creates/updates video_generation_assets and sets asset_url to mock video URLs.  
+
+
+
+Upload: Query image_generation_assets and video_generation_assets (filter by created_at if needed); display as one list of “asset links”; user selects and maps to platforms.  
+
+
+
+Later: swap mock generators for real AI/API; schema and flows stay the same.
+
+
+
+Summary
+
+
+
+
+
+
+
+Flow
+
+
+
+MVP behavior
+
+
+
+Asset pool
+
+
+
+
+
+Image
+
+
+
+Generate mock image links
+
+
+
+image_generation_assets.asset_url
+
+
+
+
+
+Video Step 1
+
+
+
+Generate mock storyboard
+
+
+
+storyboard content only
+
+
+
+
+
+Video Step 2
+
+
+
+Generate mock video links
+
+
+
+video_generation_assets.asset_url
+
+
+
+
+
+Upload
+
+
+
+Choose from pool + platforms
+
+
+
+All asset links (image + video)
+
+MVP uses mocks throughout; you replace with real storyboard and asset_url links when ready.
