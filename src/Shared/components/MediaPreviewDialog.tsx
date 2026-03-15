@@ -90,6 +90,9 @@ export function MediaPreviewDialog({
             <video
               src={media.url}
               controls
+              autoPlay
+              muted
+              playsInline
               className="w-full h-full object-contain rounded-lg"
               onError={() => setLoadError(true)}
             />
