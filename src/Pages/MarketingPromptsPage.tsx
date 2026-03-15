@@ -80,8 +80,11 @@ export default function MarketingPromptsPage() {
 
   return (
     <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Marketing prompts</h1>
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-semibold">Marketing prompts</h1>
+          <p className="text-muted-foreground text-sm mt-1">Reusable marketing style prompts for IDEATE.</p>
+        </div>
         <Button onClick={() => { setCreateOpen(true); form.reset({ name: "", prompt_text: "" }); }}>
           <Plus className="mr-2 h-4 w-4" />
           Add marketing prompt

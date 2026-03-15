@@ -1,6 +1,6 @@
-import { Home } from "lucide-react";
 import { Fragment, useEffect } from "react";
 import { Link, Outlet, useNavigate } from "react-router";
+import { Home } from "lucide-react";
 import { AppSidebar } from "@/Shared/components";
 import LoadingPage from "@/Shared/components/LoadingPage";
 import {
@@ -53,7 +53,6 @@ function PrivateLayoutContent() {
               <BreadcrumbList>
                 {breadcrumbs.map((crumb, index) => {
                   const isLast = index === breadcrumbs.length - 1;
-
                   return (
                     <Fragment key={index}>
                       <BreadcrumbItem>

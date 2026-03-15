@@ -96,8 +96,11 @@ export default function PlatformsPage() {
 
   return (
     <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Upload platforms</h1>
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-semibold">Upload platforms</h1>
+          <p className="text-muted-foreground text-sm mt-1">Configure platforms (e.g. Instagram, TikTok) for the LAUNCH step.</p>
+        </div>
         <Button onClick={() => { setCreateOpen(true); form.reset({ name: "", platform_type_id: defaultPlatformTypeId }); }} disabled={!canAdd}>
           <Plus className="mr-2 h-4 w-4" />
           Add platform {count >= MAX_PLATFORMS ? `(max ${MAX_PLATFORMS})` : ""}

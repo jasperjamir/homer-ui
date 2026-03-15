@@ -64,7 +64,10 @@ export default function VideoGenerationsPage() {
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <h1 className="text-2xl font-semibold">Video generations</h1>
+        <div>
+          <h1 className="text-2xl font-semibold">Video generations</h1>
+          <p className="text-muted-foreground text-sm mt-1">Your video generations. Open storyboard to edit or view to validate clips.</p>
+        </div>
         <div className="flex items-center gap-2">
           {selected.size > 0 && (
             <Button

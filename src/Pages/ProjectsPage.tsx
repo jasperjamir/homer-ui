@@ -86,8 +86,11 @@ export default function ProjectsPage() {
 
   return (
     <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Projects</h1>
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-semibold">Projects</h1>
+          <p className="text-muted-foreground text-sm mt-1">Project context and prompts for IDEATE.</p>
+        </div>
         <Button onClick={openCreate}>
           <Plus className="mr-2 h-4 w-4" />
           Add project

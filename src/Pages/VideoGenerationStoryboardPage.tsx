@@ -97,12 +97,15 @@ export default function VideoGenerationStoryboardPage() {
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
-        <h1 className="text-2xl font-semibold">Storyboard editor</h1>
+        <div>
+          <h1 className="text-2xl font-semibold">VALIDATE (2.1)</h1>
+          <p className="text-muted-foreground text-sm mt-1">Validate and edit your storyboard before generating videos.</p>
+        </div>
       </div>
       <JourneyStepper steps={steps} currentStepIndex={1} />
       <Card>
         <CardHeader>
-          <CardTitle>VALIDATE (2.1) — Storyboard</CardTitle>
+          <CardTitle>Storyboard</CardTitle>
           <p className="text-muted-foreground text-sm mt-2">
             {hasGeneratedVideo
               ? "Video has been generated from this storyboard. The storyboard is read-only."

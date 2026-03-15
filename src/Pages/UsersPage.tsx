@@ -191,8 +191,9 @@ export default function UsersPage() {
 
   return (
     <div className="container mx-auto space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="font-bold text-3xl">Users</h1>
+      <div>
+        <h1 className="text-2xl font-semibold">Users</h1>
+        <p className="text-muted-foreground text-sm mt-1">Manage educators and students.</p>
       </div>
 
       <Tabs

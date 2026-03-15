@@ -64,7 +64,10 @@ export default function ImageGenerationsPage() {
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <h1 className="text-2xl font-semibold">Image ideations</h1>
+        <div>
+          <h1 className="text-2xl font-semibold">Image ideations</h1>
+          <p className="text-muted-foreground text-sm mt-1">Your image generations. Select one to validate or go to IDEATE to create more.</p>
+        </div>
         <div className="flex items-center gap-2">
           {selected.size > 0 && (
             <Button

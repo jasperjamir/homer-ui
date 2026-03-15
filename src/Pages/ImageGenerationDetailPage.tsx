@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Shared/components/ui
 import { Separator } from "@/Shared/components/ui/separator";
 import { Button } from "@/Shared/components/ui/button";
 import { Skeleton } from "@/Shared/components/ui/skeleton";
-import { ArrowLeft, ImageOff } from "lucide-react";
+import { ImageOff } from "lucide-react";
 import {
   getImageGenerationAssetsWithPollingQueryOptions,
   getImageGenerationQueryOptions,
@@ -15,7 +15,7 @@ import { Badge } from "@/Shared/components/ui/badge";
 import { IMAGE_MODEL_LABELS } from "@/Features/ImageGenerations/schemas";
 import { PlatformType, PLATFORM_TYPE_LABELS } from "@/Shared/models/platform.type";
 import { JourneyStepper, getImageJourneySteps } from "@/Shared/components/JourneyStepper";
-import { ROUTES, uploadWithGenerationId } from "@/Shared/utils/routes.util";
+import { uploadWithGenerationId } from "@/Shared/utils/routes.util";
 
 /** Aspect ratio classes: Instagram 4:5, TikTok 9:16 */
 function getAspectClass(platformType: PlatformType | null): string {
@@ -57,19 +57,15 @@ export default function ImageGenerationDetailPage() {
 
   return (
     <div className="space-y-6 p-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link to={ROUTES.IMAGE_GENERATIONS}>
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <h1 className="text-2xl font-semibold">Image generation</h1>
+      <div>
+        <h1 className="text-2xl font-semibold">VALIDATE (2.1)</h1>
+        <p className="text-muted-foreground text-sm mt-1">Review and validate your generated images.</p>
       </div>
       <JourneyStepper steps={steps} currentStepIndex={1} />
       <Card>
         <CardHeader>
           <div className="flex flex-wrap items-center gap-2">
-            <CardTitle className="mb-0">VALIDATE (2.1)</CardTitle>
+            <CardTitle className="mb-0">Context</CardTitle>
             {generation.platformType && (
               <Badge variant="secondary">
                 {PLATFORM_TYPE_LABELS[generation.platformType]}

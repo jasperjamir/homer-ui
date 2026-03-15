@@ -34,13 +34,13 @@ export default function VideoGenerationNewPage() {
     <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-6">
       <Card className="w-full max-w-2xl">
         <CardHeader className="space-y-4">
-          <JourneyStepper steps={steps} currentStepIndex={0} />
           <div>
             <CardTitle>IDEATE</CardTitle>
             <p className="text-muted-foreground text-sm mt-1">
               {steps[0].description}
             </p>
           </div>
+          <JourneyStepper steps={steps} currentStepIndex={0} />
         </CardHeader>
         <CardContent>
           <GenerationForm

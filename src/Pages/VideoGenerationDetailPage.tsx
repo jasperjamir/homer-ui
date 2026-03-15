@@ -6,16 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Shared/components/ui
 import { Separator } from "@/Shared/components/ui/separator";
 import { Button } from "@/Shared/components/ui/button";
 import { Skeleton } from "@/Shared/components/ui/skeleton";
-import { ArrowLeft, VideoOff } from "lucide-react";
+import { VideoOff } from "lucide-react";
 import {
   getVideoGenerationAssetsWithPollingQueryOptions,
   getVideoGenerationQueryOptions,
 } from "@/Features/VideoGenerations/query-options";
 import { Badge } from "@/Shared/components/ui/badge";
 import { VIDEO_MODEL_LABELS } from "@/Features/ImageGenerations/schemas";
-import { PlatformType, PLATFORM_TYPE_LABELS } from "@/Shared/models/platform.type";
+import { PLATFORM_TYPE_LABELS } from "@/Shared/models/platform.type";
 import { JourneyStepper, getVideoJourneySteps } from "@/Shared/components/JourneyStepper";
-import { ROUTES, uploadWithVideoGenerationId, videoGenerationStoryboard } from "@/Shared/utils/routes.util";
+import { uploadWithVideoGenerationId } from "@/Shared/utils/routes.util";
 
 /** Video aspect ratio: Instagram Reels and TikTok both use 9:16 */
 const VIDEO_ASPECT_CLASS = "aspect-[9/16]";
@@ -53,19 +53,15 @@ export default function VideoGenerationDetailPage() {
   const steps = getVideoJourneySteps({ videoGenerationId: id });
   return (
     <div className="space-y-6 p-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link to={ROUTES.VIDEO_GENERATIONS}>
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <h1 className="text-2xl font-semibold">Video generation</h1>
+      <div>
+        <h1 className="text-2xl font-semibold">VALIDATE (2.2)</h1>
+        <p className="text-muted-foreground text-sm mt-1">Review and validate your generated videos.</p>
       </div>
       <JourneyStepper steps={steps} currentStepIndex={2} />
       <Card>
         <CardHeader>
           <div className="flex flex-wrap items-center gap-2">
-            <CardTitle className="mb-0">VALIDATE (2.2) — Videos</CardTitle>
+            <CardTitle className="mb-0">Context</CardTitle>
             {generation.platformType && (
               <Badge variant="secondary">
                 {PLATFORM_TYPE_LABELS[generation.platformType]}
