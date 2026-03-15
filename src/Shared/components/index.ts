@@ -1,5 +1,6 @@
 export * from "./AppSidebar";
 export * from "./CommonFormFields";
+export * from "./MediaPreviewDialog";
 export * from "./ErrorBoundary";
 export * from "./LoadingPage";
 export * from "./NavMain";

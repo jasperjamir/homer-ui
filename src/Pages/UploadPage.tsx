@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 import { toast } from "sonner";
+import { MediaPreviewDialog } from "@/Shared/components/MediaPreviewDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Shared/components/ui/card";
 import { Button } from "@/Shared/components/ui/button";
 import {
@@ -74,6 +75,7 @@ export default function UploadPage() {
   };
 
   const [uploading, setUploading] = useState(false);
+  const [previewMedia, setPreviewMedia] = useState<{ url: string; type: "image" | "video" } | null>(null);
   const { data: imageGenerations = [] } = useQuery(getImageGenerationsQueryOptions());
   const { data: assets = [], isLoading: assetsLoading } = useAssetsQuery(filterValue);
   const { data: platforms = [], isLoading: platformsLoading } = useQuery(
@@ -191,18 +193,30 @@ export default function UploadPage() {
                   {assets.map((asset) => (
                     <TableRow key={`${asset.type}-${asset.id}`}>
                       <TableCell className="font-medium">
-                        <div className="flex items-center gap-2">
-                          {asset.asset_url && asset.type === "image" && (
-                            <img
-                              src={asset.asset_url}
-                              alt=""
-                              className="h-10 w-10 rounded object-cover"
-                            />
-                          )}
-                          <span>
-                            {asset.type} #{asset.index} ({new Date(asset.created_at).toLocaleString()})
-                          </span>
-                        </div>
+                        {asset.asset_url ? (
+                          <button
+                            type="button"
+                        onClick={() => setPreviewMedia({ url: asset.asset_url!, type: asset.type })}
+                            className="flex items-center gap-2 text-left w-full text-foreground hover:text-accent-blue transition-colors"
+                          >
+                            {asset.type === "image" && (
+                              <img
+                                src={asset.asset_url}
+                                alt=""
+                                className="h-10 w-10 rounded object-cover"
+                              />
+                            )}
+                            <span>
+                              {asset.type} #{asset.index} ({new Date(asset.created_at).toLocaleString()})
+                            </span>
+                          </button>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <span>
+                              {asset.type} #{asset.index} ({new Date(asset.created_at).toLocaleString()})
+                            </span>
+                          </div>
+                        )}
                       </TableCell>
                       {platforms.map((p) => (
                         <TableCell key={p.id} className="text-center">
@@ -218,6 +232,11 @@ export default function UploadPage() {
               </Table>
             </div>
           )}
+          <MediaPreviewDialog
+            open={!!previewMedia}
+            onOpenChange={(open) => !open && setPreviewMedia(null)}
+            media={previewMedia}
+          />
           {assets.length > 0 && (
             <div className="mt-4">
               <Button

@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "react-router";
-import {
-  Dialog,
-  DialogContent,
-} from "@/Shared/components/ui/dialog";
+import { MediaPreviewDialog } from "@/Shared/components/MediaPreviewDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Shared/components/ui/card";
 import { Button } from "@/Shared/components/ui/button";
 import { Skeleton } from "@/Shared/components/ui/skeleton";
@@ -39,8 +36,6 @@ function NoImagePlaceholder({ className }: { className?: string }) {
 export default function ImageGenerationDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [previewLoadError, setPreviewLoadError] = useState(false);
-  const showPreviewPlaceholder = !previewUrl?.trim() || previewLoadError;
   const { data: generation, isLoading: genLoading } = useQuery(
     getImageGenerationQueryOptions(id ?? "")
   );
@@ -136,10 +131,7 @@ export default function ImageGenerationDetailPage() {
                     {asset.assetUrl?.trim() ? (
                       <button
                         type="button"
-                        onClick={() => {
-                          setPreviewUrl(asset.assetUrl);
-                          setPreviewLoadError(false);
-                        }}
+                        onClick={() => setPreviewUrl(asset.assetUrl)}
                         className={`relative w-full ${aspectClass} rounded overflow-hidden cursor-zoom-in hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2`}
                       >
                         <img
@@ -198,35 +190,12 @@ export default function ImageGenerationDetailPage() {
                   </div>
                 )}
               </div>
-              <Dialog
+              <MediaPreviewDialog
                 open={!!previewUrl}
-                onOpenChange={(open) => {
-                  if (!open) {
-                    setPreviewUrl(null);
-                    setPreviewLoadError(false);
-                  }
-                }}
-              >
-                <DialogContent
-                  className="max-w-4xl p-0 overflow-hidden"
-                  showCloseButton={true}
-                >
-                  {showPreviewPlaceholder ? (
-                    <NoImagePlaceholder className={`min-h-[300px] w-full ${aspectClass}`} />
-                  ) : (
-                    previewUrl && (
-                      <div className={`w-full max-h-[85vh] ${aspectClass}`}>
-                        <img
-                          src={previewUrl}
-                          alt="Preview"
-                          className="w-full h-full object-contain rounded-lg"
-                          onError={() => setPreviewLoadError(true)}
-                        />
-                      </div>
-                    )
-                  )}
-                </DialogContent>
-              </Dialog>
+                onOpenChange={(open) => !open && setPreviewUrl(null)}
+                media={previewUrl ? { url: previewUrl, type: "image" } : null}
+                imageAspectClass={aspectClass}
+              />
             </>
           )}
         </CardContent>
