@@ -7,16 +7,32 @@ import {
 } from "@/Shared/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Shared/components/ui/card";
 import { Button } from "@/Shared/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { Skeleton } from "@/Shared/components/ui/skeleton";
+import { ArrowLeft, ImageOff } from "lucide-react";
 import {
   getImageGenerationAssetsWithPollingQueryOptions,
   getImageGenerationQueryOptions,
 } from "@/Features/ImageGenerations/query-options";
 import { ROUTES } from "@/Shared/utils/routes.util";
 
+function NoImagePlaceholder({ className }: { className?: string }) {
+  return (
+    <div
+      className={`flex flex-col items-center justify-center gap-2 bg-muted rounded text-muted-foreground ${className ?? ""}`}
+      role="img"
+      aria-label="No image available"
+    >
+      <ImageOff className="size-12" />
+      <span className="text-sm font-medium">No image available</span>
+    </div>
+  );
+}
+
 export default function ImageGenerationDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewLoadError, setPreviewLoadError] = useState(false);
+  const showPreviewPlaceholder = !previewUrl?.trim() || previewLoadError;
   const { data: generation, isLoading: genLoading } = useQuery(
     getImageGenerationQueryOptions(id ?? "")
   );
@@ -49,12 +65,45 @@ export default function ImageGenerationDetailPage() {
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Image links ({assets.length})</CardTitle>
-          <p className="text-muted-foreground text-sm">
-            {assets.length < generation.assetCount
-              ? `Generating… ${assets.length}/${generation.assetCount} assets ready.`
-              : "Use the Upload page to map these to platforms."}
-          </p>
+          <CardTitle>Image links</CardTitle>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-2 text-sm">
+              <span className="text-muted-foreground">
+                {assets.length < generation.assetCount
+                  ? "Generating…"
+                  : "Use the Upload page to map these to platforms."}
+              </span>
+              <span className="font-medium tabular-nums">
+                {assets.length}/{generation.assetCount}
+              </span>
+            </div>
+            <div
+              className="flex gap-1"
+              role="progressbar"
+              aria-valuenow={assets.length}
+              aria-valuemin={0}
+              aria-valuemax={generation.assetCount}
+              aria-label={`${assets.length} of ${generation.assetCount} assets ready`}
+            >
+              {Array.from({ length: generation.assetCount }, (_, i) => {
+                const isComplete = i < assets.length;
+                const isInProgress =
+                  i === assets.length && assets.length < generation.assetCount;
+                return (
+                  <div
+                    key={i}
+                    className={`h-2 flex-1 rounded-full transition-colors ${
+                      isComplete
+                        ? "bg-primary"
+                        : isInProgress
+                          ? "animate-pulse bg-primary/50"
+                          : "bg-primary/20"
+                    }`}
+                  />
+                );
+              })}
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           {assetsLoading ? (
@@ -64,40 +113,95 @@ export default function ImageGenerationDetailPage() {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                 {assets.map((asset) => (
                   <div key={asset.id} className="rounded-lg border p-2 space-y-2">
-                    {asset.assetUrl ? (
+                    {asset.assetUrl?.trim() ? (
                       <button
                         type="button"
-                        onClick={() => setPreviewUrl(asset.assetUrl)}
-                        className="w-full aspect-square rounded overflow-hidden cursor-zoom-in hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                        onClick={() => {
+                          setPreviewUrl(asset.assetUrl);
+                          setPreviewLoadError(false);
+                        }}
+                        className="relative w-full aspect-square rounded overflow-hidden cursor-zoom-in hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                       >
                         <img
                           src={asset.assetUrl}
-                          alt={`Asset ${asset.index}`}
+                          alt={`Image ${asset.index}`}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                            const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                            if (fallback) fallback.style.display = "flex";
+                          }}
                         />
+                        <div
+                          className="absolute inset-0 hidden flex-col items-center justify-center bg-muted"
+                          style={{ display: "none" }}
+                        >
+                          <NoImagePlaceholder className="!bg-transparent" />
+                        </div>
+                        <span
+                          className="absolute bottom-2 left-2 rounded-md bg-black/70 px-2 py-0.5 text-xs font-medium text-white"
+                          aria-hidden
+                        >
+                          {asset.index}
+                        </span>
                       </button>
                     ) : (
-                      <div className="w-full aspect-square bg-muted rounded flex items-center justify-center text-muted-foreground text-sm">
-                        No link
+                      <div className="relative w-full aspect-square rounded overflow-hidden">
+                        <NoImagePlaceholder className="w-full aspect-square" />
+                        <span
+                          className="absolute bottom-2 left-2 rounded-md bg-black/70 px-2 py-0.5 text-xs font-medium text-white"
+                          aria-hidden
+                        >
+                          {asset.index}
+                        </span>
                       </div>
                     )}
-                    <p className="text-xs text-muted-foreground truncate" title={asset.assetUrl ?? ""}>
-                      #{asset.index}
-                    </p>
                   </div>
                 ))}
+                {assets.length < generation.assetCount && (
+                  <div className="rounded-lg border border-dashed border-muted-foreground/30 p-2">
+                    <div className="relative w-full aspect-square rounded overflow-hidden">
+                      <Skeleton className="absolute inset-0 rounded" />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                        <div className="size-8 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+                        <span className="text-xs font-medium">
+                          Loading image {assets.length + 1}…
+                        </span>
+                      </div>
+                      <span
+                        className="absolute bottom-2 left-2 rounded-md bg-black/70 px-2 py-0.5 text-xs font-medium text-white"
+                        aria-hidden
+                      >
+                        {assets.length + 1}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
-              <Dialog open={!!previewUrl} onOpenChange={(open) => !open && setPreviewUrl(null)}>
+              <Dialog
+                open={!!previewUrl}
+                onOpenChange={(open) => {
+                  if (!open) {
+                    setPreviewUrl(null);
+                    setPreviewLoadError(false);
+                  }
+                }}
+              >
                 <DialogContent
                   className="max-w-4xl p-0 overflow-hidden"
                   showCloseButton={true}
                 >
-                  {previewUrl && (
-                    <img
-                      src={previewUrl}
-                      alt="Preview"
-                      className="w-full max-h-[85vh] object-contain rounded-lg"
-                    />
+                  {showPreviewPlaceholder ? (
+                    <NoImagePlaceholder className="min-h-[300px] w-full" />
+                  ) : (
+                    previewUrl && (
+                      <img
+                        src={previewUrl}
+                        alt="Preview"
+                        className="w-full max-h-[85vh] object-contain rounded-lg"
+                        onError={() => setPreviewLoadError(true)}
+                      />
+                    )
                   )}
                 </DialogContent>
               </Dialog>
