@@ -12,8 +12,9 @@ import {
 } from "@/Features/VideoGenerations/query-options";
 import { Badge } from "@/Shared/components/ui/badge";
 import { VIDEO_MODEL_LABELS } from "@/Features/ImageGenerations/schemas";
-import { PLATFORM_TYPE_LABELS } from "@/Shared/models/platform.type";
-import { ROUTES, uploadWithVideoGenerationId } from "@/Shared/utils/routes.util";
+import { PlatformType, PLATFORM_TYPE_LABELS } from "@/Shared/models/platform.type";
+import { JourneyStepper, getVideoJourneySteps } from "@/Shared/components/JourneyStepper";
+import { ROUTES, uploadWithVideoGenerationId, videoGenerationStoryboard } from "@/Shared/utils/routes.util";
 
 /** Video aspect ratio: Instagram Reels and TikTok both use 9:16 */
 const VIDEO_ASPECT_CLASS = "aspect-[9/16]";
@@ -48,6 +49,7 @@ export default function VideoGenerationDetailPage() {
   if (!id) return <div className="p-6">Missing generation ID</div>;
   if (genLoading || !generation) return <div className="p-6">Generating...</div>;
 
+  const steps = getVideoJourneySteps({ videoGenerationId: id });
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center gap-4">
@@ -58,10 +60,11 @@ export default function VideoGenerationDetailPage() {
         </Button>
         <h1 className="text-2xl font-semibold">Video generation</h1>
       </div>
+      <JourneyStepper steps={steps} currentStepIndex={2} />
       <Card>
         <CardHeader>
           <div className="flex flex-wrap items-center gap-2">
-            <CardTitle className="mb-0">Context</CardTitle>
+            <CardTitle className="mb-0">VALIDATE (2.2) — Videos</CardTitle>
             {generation.platformType && (
               <Badge variant="secondary">
                 {PLATFORM_TYPE_LABELS[generation.platformType]}
@@ -71,6 +74,10 @@ export default function VideoGenerationDetailPage() {
               <Badge variant="outline">{VIDEO_MODEL_LABELS[generation.model]}</Badge>
             )}
           </div>
+          <p className="text-muted-foreground text-sm mt-2">{steps[2].description}</p>
+          {steps[2].context && (
+            <p className="text-muted-foreground text-sm mt-2">{steps[2].context}</p>
+          )}
           <p className="text-muted-foreground text-sm mt-2">{generation.context}</p>
         </CardHeader>
       </Card>

@@ -28,7 +28,7 @@ export default function ImageGenerationsPage() {
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Image generations</h1>
+        <h1 className="text-2xl font-semibold">Image ideations</h1>
         <Button asChild>
           <Link to={ROUTES.IMAGE_GENERATIONS_NEW}>
             <Plus className="mr-2 h-4 w-4" />

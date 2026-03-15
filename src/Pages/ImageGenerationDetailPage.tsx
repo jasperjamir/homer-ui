@@ -13,7 +13,8 @@ import {
 import { Badge } from "@/Shared/components/ui/badge";
 import { IMAGE_MODEL_LABELS } from "@/Features/ImageGenerations/schemas";
 import { PlatformType, PLATFORM_TYPE_LABELS } from "@/Shared/models/platform.type";
-import { ROUTES, uploadWithGenerationId} from "@/Shared/utils/routes.util";
+import { JourneyStepper, getImageJourneySteps } from "@/Shared/components/JourneyStepper";
+import { ROUTES, uploadWithGenerationId } from "@/Shared/utils/routes.util";
 
 /** Aspect ratio classes: Instagram 4:5, TikTok 9:16 */
 function getAspectClass(platformType: PlatformType | null): string {
@@ -51,6 +52,7 @@ export default function ImageGenerationDetailPage() {
   if (genLoading || !generation) return <div className="p-6">Generating...</div>;
 
   const aspectClass = getAspectClass(generation.platformType);
+  const steps = getImageJourneySteps({ imageGenerationId: id });
 
   return (
     <div className="space-y-6 p-6">
@@ -62,10 +64,11 @@ export default function ImageGenerationDetailPage() {
         </Button>
         <h1 className="text-2xl font-semibold">Image generation</h1>
       </div>
+      <JourneyStepper steps={steps} currentStepIndex={1} />
       <Card>
         <CardHeader>
           <div className="flex flex-wrap items-center gap-2">
-            <CardTitle className="mb-0">Context</CardTitle>
+            <CardTitle className="mb-0">VALIDATE (2.1)</CardTitle>
             {generation.platformType && (
               <Badge variant="secondary">
                 {PLATFORM_TYPE_LABELS[generation.platformType]}
@@ -75,6 +78,10 @@ export default function ImageGenerationDetailPage() {
               <Badge variant="outline">{IMAGE_MODEL_LABELS[generation.model]}</Badge>
             )}
           </div>
+          <p className="text-muted-foreground text-sm mt-2">{steps[1].description}</p>
+          {steps[1].context && (
+            <p className="text-muted-foreground text-sm mt-2">{steps[1].context}</p>
+          )}
           <p className="text-muted-foreground text-sm mt-2">{generation.context}</p>
         </CardHeader>
       </Card>

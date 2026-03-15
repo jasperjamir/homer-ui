@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 import { toast } from "sonner";
+import { JourneyStepper, getImageJourneySteps, getVideoJourneySteps } from "@/Shared/components/JourneyStepper";
 import { MediaPreviewDialog } from "@/Shared/components/MediaPreviewDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Shared/components/ui/card";
 import { Button } from "@/Shared/components/ui/button";
@@ -136,16 +137,25 @@ export default function UploadPage() {
     }
   };
 
+  const imageGenId = isGenerationFilter && !isVideoGenerationFilter ? filterValue : null;
+  const videoGenId = isVideoGenerationFilter ? filterValue.replace(/^video:/, "") : null;
+  const uploadJourneySteps = isVideoGenerationFilter
+    ? getVideoJourneySteps({ videoGenerationId: videoGenId })
+    : getImageJourneySteps({ imageGenerationId: imageGenId });
+  const uploadJourneyCurrentIndex = isVideoGenerationFilter ? 3 : 2;
+
   return (
     <div className="space-y-6 p-6">
-      <h1 className="text-2xl font-semibold">Upload assets</h1>
-      <p className="text-muted-foreground text-sm">
-        Choose assets (from the pool) and map them to platforms. Filter by time or by image/video generation, then check which asset goes to which platform.
+      <h1 className="text-2xl font-semibold">LAUNCH</h1>
+      <p className="text-muted-foreground text-sm max-w-2xl">
+        {uploadJourneySteps[uploadJourneyCurrentIndex].description}
       </p>
+
+      <JourneyStepper steps={uploadJourneySteps} currentStepIndex={uploadJourneyCurrentIndex} />
 
       <Card>
         <CardHeader>
-          <CardTitle>Step 2: Upload assets to chosen platforms</CardTitle>
+          <CardTitle>Step 3: Upload to platforms</CardTitle>
           <div className="flex items-center gap-4 pt-2 flex-wrap">
             <Select value={filterValue} onValueChange={handleFilterChange}>
               <SelectTrigger className="w-[220px]">
@@ -224,6 +234,16 @@ export default function UploadPage() {
                                 src={asset.asset_url}
                                 alt=""
                                 className="h-10 w-10 rounded object-cover"
+                              />
+                            )}
+                            {asset.type === "video" && (
+                              <video
+                                src={asset.asset_url}
+                                className="h-10 w-10 rounded object-cover"
+                                muted
+                                playsInline
+                                preload="metadata"
+                                aria-hidden
                               />
                             )}
                             <span>

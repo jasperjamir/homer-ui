@@ -18,6 +18,7 @@ import {
   storyboardContentToRecord,
 } from "@/Features/VideoGenerations/models";
 import { useNavigate } from "react-router";
+import { JourneyStepper, getVideoJourneySteps } from "@/Shared/components/JourneyStepper";
 import { ROUTES, videoGenerationDetail } from "@/Shared/utils/routes.util";
 
 export default function VideoGenerationStoryboardPage() {
@@ -86,6 +87,7 @@ export default function VideoGenerationStoryboardPage() {
   if (!id) return <div className="p-6">Missing generation ID</div>;
   if (genLoading || !generation) return <div className="p-6">Generating...</div>;
 
+  const steps = getVideoJourneySteps({ videoGenerationId: id });
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center gap-4">
@@ -96,10 +98,15 @@ export default function VideoGenerationStoryboardPage() {
         </Button>
         <h1 className="text-2xl font-semibold">Storyboard editor</h1>
       </div>
+      <JourneyStepper steps={steps} currentStepIndex={1} />
       <Card>
         <CardHeader>
-          <CardTitle>Step 2: Storyboard</CardTitle>
-          <p className="text-muted-foreground text-sm">
+          <CardTitle>VALIDATE (2.1) — Storyboard</CardTitle>
+          <p className="text-muted-foreground text-sm mt-1">{steps[1].description}</p>
+          {steps[1].context && (
+            <p className="text-muted-foreground text-sm mt-2">{steps[1].context}</p>
+          )}
+          <p className="text-muted-foreground text-sm mt-2">
             {hasGeneratedVideo
               ? "Video has been generated from this storyboard. The storyboard is read-only."
               : "Edit each frame below, then click Save storyboard and generate video."}

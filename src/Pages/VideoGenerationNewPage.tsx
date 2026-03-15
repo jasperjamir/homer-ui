@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Shared/components/ui/card";
+import { JourneyStepper, getVideoJourneySteps } from "@/Shared/components/JourneyStepper";
 import { GenerationForm } from "@/Features/ImageGenerations/components";
 import { useCreateVideoGenerationMutation } from "@/Features/VideoGenerations/query-options";
 import type { GenerationFormData } from "@/Features/ImageGenerations/schemas";
@@ -28,14 +29,18 @@ export default function VideoGenerationNewPage() {
     });
   };
 
+  const steps = getVideoJourneySteps({});
   return (
     <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center p-6">
       <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle>Step 1: Create storyboard</CardTitle>
-          <p className="text-muted-foreground text-sm">
-            Submit to create a storyboard via the API. Edit it in the next step, then generate videos.
-          </p>
+        <CardHeader className="space-y-4">
+          <JourneyStepper steps={steps} currentStepIndex={0} />
+          <div>
+            <CardTitle>IDEATE</CardTitle>
+            <p className="text-muted-foreground text-sm mt-1">
+              {steps[0].description}
+            </p>
+          </div>
         </CardHeader>
         <CardContent>
           <GenerationForm
