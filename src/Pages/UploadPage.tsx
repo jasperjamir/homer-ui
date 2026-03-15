@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Shared/components/ui/card";
 import { Button } from "@/Shared/components/ui/button";
@@ -19,26 +20,33 @@ import {
   TableHeader,
   TableRow,
 } from "@/Shared/components/ui/table";
+import { getImageGenerationsQueryOptions } from "@/Features/ImageGenerations/query-options";
 import { getUploadPlatformsQueryOptions } from "@/Features/UploadPlatforms/query-options";
 import { useSaveMappingsMutation } from "@/Features/Upload/query-options";
 import type { PoolAsset } from "@/Features/Upload/models";
-import { useQuery } from "@tanstack/react-query";
 import { getAssetsInRange } from "@/Features/Upload/services";
 
-const FILTER_OPTIONS = [
+const TIME_FILTER_OPTIONS = [
   { value: "hour", label: "Last hour", since: () => new Date(Date.now() - 60 * 60 * 1000) },
   { value: "24h", label: "Last 24 hours", since: () => new Date(Date.now() - 24 * 60 * 60 * 1000) },
   { value: "all", label: "All assets", since: () => undefined },
 ] as const;
 
-function useAssetsQuery(filter: "hour" | "24h" | "all") {
+function useAssetsQuery(filterValue: string) {
+  const isGenerationId = filterValue && !TIME_FILTER_OPTIONS.some((o) => o.value === filterValue);
   const since = useMemo(() => {
-    const opt = FILTER_OPTIONS.find((o) => o.value === filter);
+    if (isGenerationId) return undefined;
+    const opt = TIME_FILTER_OPTIONS.find((o) => o.value === filterValue);
     return opt?.since();
-  }, [filter]);
+  }, [filterValue, isGenerationId]);
   return useQuery({
-    queryKey: ["upload-assets", filter, since?.toISOString()],
-    queryFn: () => getAssetsInRange({ since, limit: 200 }),
+    queryKey: ["upload-assets", filterValue, since?.toISOString()],
+    queryFn: () =>
+      getAssetsInRange({
+        since,
+        limit: 200,
+        ...(isGenerationId ? { imageGenerationId: filterValue } : {}),
+      }),
     staleTime: 1000 * 30,
   });
 }
@@ -48,10 +56,25 @@ function key(asset: PoolAsset, platformId: string): string {
 }
 
 export default function UploadPage() {
-  const [filter, setFilter] = useState<"hour" | "24h" | "all">("all");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const generationIdFromUrl = searchParams.get("generation-id");
+  const timeFromUrl = searchParams.get("time");
+  const timeValue =
+    timeFromUrl === "hour" || timeFromUrl === "24h" ? timeFromUrl : "all";
+  const filterValue = generationIdFromUrl ?? timeValue;
+
   const [checked, setChecked] = useState<Set<string>>(new Set());
 
-  const { data: assets = [], isLoading: assetsLoading } = useAssetsQuery(filter);
+  const handleFilterChange = (value: string) => {
+    if (value === "all" || value === "hour" || value === "24h") {
+      setSearchParams(value === "all" ? {} : { time: value });
+    } else {
+      setSearchParams({ "generation-id": value });
+    }
+  };
+
+  const { data: imageGenerations = [] } = useQuery(getImageGenerationsQueryOptions());
+  const { data: assets = [], isLoading: assetsLoading } = useAssetsQuery(filterValue);
   const { data: platforms = [], isLoading: platformsLoading } = useQuery(
     getUploadPlatformsQueryOptions()
   );
@@ -61,6 +84,8 @@ export default function UploadPage() {
     },
     onError: (e) => toast.error(e.message),
   });
+
+  const isGenerationFilter = filterValue && !TIME_FILTER_OPTIONS.some((o) => o.value === filterValue);
 
   const toggle = (asset: PoolAsset, platformId: string) => {
     const k = key(asset, platformId);
@@ -87,23 +112,32 @@ export default function UploadPage() {
     <div className="space-y-6 p-6">
       <h1 className="text-2xl font-semibold">Upload assets</h1>
       <p className="text-muted-foreground text-sm">
-        Choose assets (from the pool) and map them to platforms. Filter by time, then check which asset goes to which platform.
+        Choose assets (from the pool) and map them to platforms. Filter by time or by image generation, then check which asset goes to which platform.
       </p>
 
       <Card>
         <CardHeader>
           <CardTitle>Step 1: Choose assets and platforms</CardTitle>
-          <div className="flex items-center gap-4 pt-2">
-            <Select value={filter} onValueChange={(v) => setFilter(v as "hour" | "24h" | "all")}>
-              <SelectTrigger className="w-[180px]">
+          <div className="flex items-center gap-4 pt-2 flex-wrap">
+            <Select value={filterValue} onValueChange={handleFilterChange}>
+              <SelectTrigger className="w-[220px]">
                 <SelectValue placeholder="Filter" />
               </SelectTrigger>
               <SelectContent>
-                {FILTER_OPTIONS.map((o) => (
+                {TIME_FILTER_OPTIONS.map((o) => (
                   <SelectItem key={o.value} value={o.value}>
                     {o.label}
                   </SelectItem>
                 ))}
+                {imageGenerations.length > 0 && (
+                  <>
+                    {imageGenerations.map((g) => (
+                      <SelectItem key={g.id} value={g.id}>
+                        Generation {new Date(g.createdAt).toLocaleString()}
+                      </SelectItem>
+                    ))}
+                  </>
+                )}
               </SelectContent>
             </Select>
             <Button onClick={handleSave} disabled={saveMutation.isPending || checked.size === 0}>
@@ -121,7 +155,11 @@ export default function UploadPage() {
           ) : assetsLoading ? (
             <p className="text-muted-foreground">Loading assets...</p>
           ) : assets.length === 0 ? (
-            <p className="text-muted-foreground">No assets in this range. Generate some images or videos first.</p>
+            <p className="text-muted-foreground">
+              {isGenerationFilter
+                ? "No images in this generation yet."
+                : "No assets in this range. Generate some images or videos first."}
+            </p>
           ) : (
             <div className="overflow-x-auto">
               <Table>

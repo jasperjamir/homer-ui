@@ -14,7 +14,7 @@ import {
   getImageGenerationQueryOptions,
 } from "@/Features/ImageGenerations/query-options";
 import { PlatformType } from "@/Shared/models/platform.type";
-import { ROUTES } from "@/Shared/utils/routes.util";
+import { ROUTES, uploadWithGenerationId } from "@/Shared/utils/routes.util";
 
 /** Aspect ratio classes: Instagram 4:5, TikTok 9:16 */
 function getAspectClass(platformType: PlatformType | null): string {
@@ -220,7 +220,7 @@ export default function ImageGenerationDetailPage() {
         </CardContent>
       </Card>
       <Button asChild>
-        <Link to={ROUTES.UPLOAD}>Go to Upload (map to platforms)</Link>
+        <Link to={uploadWithGenerationId(id)}>Go to Upload (map to platforms)</Link>
       </Button>
     </div>
   );

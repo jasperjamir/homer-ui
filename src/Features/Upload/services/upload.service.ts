@@ -5,13 +5,15 @@ export interface GetAssetsInRangeOptions {
   /** Filter assets created after this date (e.g. last hour) */
   since?: Date;
   limit?: number;
+  /** When set, only return image assets from this image generation (no videos) */
+  imageGenerationId?: string;
 }
 
-/** Get all asset links (image + video) optionally filtered by time - for Upload step */
+/** Get all asset links (image + video) optionally filtered by time or image generation - for Upload step */
 export async function getAssetsInRange(
   options: GetAssetsInRangeOptions = {},
 ): Promise<PoolAsset[]> {
-  const { since, limit = 500 } = options;
+  const { since, limit = 500, imageGenerationId } = options;
   const sinceIso = since?.toISOString();
 
   let imageQuery = supabase
@@ -20,6 +22,23 @@ export async function getAssetsInRange(
     .order("created_at", { ascending: false })
     .limit(limit);
   if (sinceIso) imageQuery = imageQuery.gte("created_at", sinceIso);
+  if (imageGenerationId) imageQuery = imageQuery.eq("image_generation_id", imageGenerationId);
+
+  if (imageGenerationId) {
+    const imageResult = await imageQuery;
+    if (imageResult.error) throw imageResult.error;
+    const imageAssets: PoolAsset[] = (imageResult.data ?? []).map((row: Record<string, unknown>) => ({
+      type: "image" as const,
+      id: row.id as string,
+      asset_url: row.asset_url as string | null,
+      created_at: row.created_at as string,
+      index: row.index as number,
+      generation_id: row.image_generation_id as string,
+    }));
+    return imageAssets.sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    );
+  }
 
   let videoQuery = supabase
     .from("video_generation_assets")
