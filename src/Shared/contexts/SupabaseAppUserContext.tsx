@@ -1,13 +1,9 @@
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import type { AppUser } from "@/Shared/models";
-import { AppUserRole } from "@/Shared/models";
-import { getAppUserQueryOptions } from "@/Features/AppUser/query-options";
 import { supabase } from "@/Shared/lib/supabase";
 
 interface SupabaseAppUserContextValue {
-  appUser: AppUser | null;
+  appUser: null;
   authUserId: string | null;
   isLoading: boolean;
   isEducator: boolean;
@@ -19,12 +15,12 @@ const SupabaseAppUserContext =
 
 export function SupabaseAppUserProvider({ children }: { children: ReactNode }) {
   const [authUserId, setAuthUserId] = useState<string | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setAuthUserId(session?.user?.id ?? null);
-      setAuthLoading(false);
+      setIsLoading(false);
     });
 
     const {
@@ -36,17 +32,12 @@ export function SupabaseAppUserProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const { data: appUser = null, isPending: appUserLoading } = useQuery({
-    ...getAppUserQueryOptions(authUserId),
-    enabled: !!authUserId,
-  });
-
   const value: SupabaseAppUserContextValue = {
-    appUser,
+    appUser: null,
     authUserId,
-    isLoading: authLoading || (!!authUserId && appUserLoading),
-    isEducator: appUser?.role === AppUserRole.EDUCATOR ?? false,
-    isStudent: appUser?.role === AppUserRole.STUDENT ?? false,
+    isLoading,
+    isEducator: false,
+    isStudent: true,
   };
 
   return (

@@ -1,6 +1,6 @@
 import { Home } from "lucide-react";
 import { Fragment, useEffect } from "react";
-import { Link, Outlet, useLocation, useNavigate } from "react-router";
+import { Link, Outlet, useNavigate } from "react-router";
 import { AppSidebar, ThemeToggle } from "@/Shared/components";
 import LoadingPage from "@/Shared/components/LoadingPage";
 import {
@@ -13,7 +13,7 @@ import {
 } from "@/Shared/components/ui/breadcrumb";
 import { Separator } from "@/Shared/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/Shared/components/ui/sidebar";
-import { useAuth, useCurrentAppUser, useViewMode, ViewModeProvider } from "@/Shared/contexts";
+import { useAuth, ViewModeProvider } from "@/Shared/contexts";
 import { useBreadcrumbs } from "@/Shared/hooks/use-breadcrumbs";
 import { ROUTES } from "@/Shared/utils";
 
@@ -43,22 +43,7 @@ export default function PrivateLayout() {
 }
 
 function PrivateLayoutContent() {
-  const navigate = useNavigate();
-  const location = useLocation();
   const { breadcrumbs } = useBreadcrumbs();
-  const { isEducator } = useCurrentAppUser();
-  const { viewAsStudent } = useViewMode();
-
-  useEffect(() => {
-    const studentAllowedPaths: string[] = [ROUTES.STUDENT_DASHBOARD, ROUTES.LEARNING_MODULES];
-    const isRestrictedToStudentView = !isEducator || viewAsStudent;
-    if (
-      isRestrictedToStudentView &&
-      !studentAllowedPaths.includes(location.pathname)
-    ) {
-      navigate(ROUTES.STUDENT_DASHBOARD, { replace: true });
-    }
-  }, [location.pathname, navigate, viewAsStudent, isEducator]);
 
   return (
     <SidebarProvider className="!min-h-0 h-screen max-h-screen">
