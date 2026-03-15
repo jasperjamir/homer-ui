@@ -21,9 +21,9 @@ export default function Login() {
 
   return (
     <div className="flex min-h-svh flex-col">
-      <div className="flex flex-1 flex-col gap-4 p-6 md:p-10">
+      <div className="flex flex-1 flex-col p-6 md:p-10">
         {LOGO_LOGIN_URL && (
-          <div className="flex justify-center gap-2 md:justify-start">
+          <div className="mb-10 flex justify-center gap-2 md:mb-12 md:justify-start">
             <a href={PUBLIC_WEBSITE_URL} target="_blank" rel="noopener">
               <BrandLogo variant="login" className="h-14" />
             </a>
@@ -32,17 +32,19 @@ export default function Login() {
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-sm">
             <div className={cn("flex flex-col gap-6")}>
-              <Card>
-                <CardHeader className="text-center">
+              <Card className="border-primary/20">
+                <CardHeader className="space-y-4 text-center">
                   {LOGO_SQUARE_URL && (
                     <BrandLogo variant="square" className="mx-auto h-12" />
                   )}
-                  <CardTitle className="font-display text-xl">
-                    {LOGIN_WELCOME_TITLE}
-                  </CardTitle>
-                  <CardDescription>
-                    {LOGIN_WELCOME_DESCRIPTION}
-                  </CardDescription>
+                  <div className="space-y-2">
+                    <CardTitle className="font-display text-xl">
+                      {LOGIN_WELCOME_TITLE}
+                    </CardTitle>
+                    <CardDescription className="text-accent-blue">
+                      {LOGIN_WELCOME_DESCRIPTION}
+                    </CardDescription>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <LoginForm onSubmit={handleLogin} />

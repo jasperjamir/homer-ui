@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircleIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import GoogleIcon from "@/Assets/images/google-icon.svg";
 import { loginRules } from "@/Features/Auth/rules";
 import { type LoginFormData, loginSchema } from "@/Features/Auth/schemas";
@@ -52,22 +53,12 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
   };
 
   const handleGoogleLogin = async () => {
-    try {
-      setError(null);
-      setIsGoogleLoading(true);
-      const { data, error: signInError } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-      });
-      if (signInError) throw signInError;
-      if (data?.url) {
-        window.location.href = data.url;
-      }
-    } catch (err) {
-      const errorRule = findRule(err as Error, loginRules);
-      setError(errorRule.message);
-    } finally {
-      setIsGoogleLoading(false);
-    }
+    setIsGoogleLoading(true);
+    setError(null);
+    // Simulate brief delay for UX
+    await new Promise((r) => setTimeout(r, 300));
+    setIsGoogleLoading(false);
+    toast.info("Login with Google is under construction. Please use email and password for now.");
   };
 
   return (
@@ -113,16 +104,16 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
         </Button>
         <div className="relative my-0">
           <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
+            <span className="w-full border-t border-accent-blue/30" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+            <span className="bg-card px-2 text-accent-blue/90">Or continue with</span>
           </div>
         </div>
 
         <Button
           variant="outline"
-          className="w-full"
+          className="w-full border-accent-blue/50 text-accent-blue hover:bg-accent-blue/10 hover:border-accent-blue"
           onClick={handleGoogleLogin}
           disabled={isPending || isGoogleLoading}
           isLoading={isGoogleLoading}
