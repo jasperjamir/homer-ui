@@ -1,33 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-type Theme = "light" | "dark";
-
+/** App is dark-only. No theme toggle. */
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const savedTheme = localStorage.getItem("theme") as Theme | null;
-    if (savedTheme) {
-      return savedTheme;
-    }
-
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      return "dark";
-    }
-
-    return "light";
-  });
-
   useEffect(() => {
     const root = document.documentElement;
+    root.classList.remove("light");
+    root.classList.add("dark");
+    root.setAttribute("data-theme", "dark");
+  }, []);
 
-    root.classList.remove("light", "dark");
-    root.classList.add(theme);
-
-    localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  return {
+    theme: "dark" as const,
+    setTheme: () => {},
+    toggleTheme: () => {},
   };
-
-  return { theme, setTheme, toggleTheme };
 }

@@ -1,7 +1,7 @@
 import { Home } from "lucide-react";
 import { Fragment, useEffect } from "react";
 import { Link, Outlet, useNavigate } from "react-router";
-import { AppSidebar, ThemeToggle } from "@/Shared/components";
+import { AppSidebar } from "@/Shared/components";
 import LoadingPage from "@/Shared/components/LoadingPage";
 import {
   Breadcrumb,
@@ -91,9 +91,7 @@ function PrivateLayoutContent() {
                 })}
               </BreadcrumbList>
             </Breadcrumb>
-            <div className="ml-auto">
-              <ThemeToggle />
-            </div>
+            <div className="ml-auto" />
           </div>
         </header>
         <div className="min-h-0 flex-1 overflow-auto">

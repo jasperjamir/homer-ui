@@ -1,129 +1,75 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
+/* Design system: dark only. No light mode. */
 :root {
-  /* Brand palette (override per customer for white-label) */
-  --brand-dark-pine: #0B1E1E;
-  --brand-sage: #4A8F6A;
-  --brand-white: #FDFDFD;
-  /* Derived: professional tints from brand */
-  --brand-sage-muted: #E8F0EC;
-  --brand-sage-subtle: #F0F5F2;
-  --brand-pine-muted: #3D5C5C;
-  --brand-border-light: #DDE5E2;
-  --brand-border-subtle: #E8EDEB;
-  --font-heading: "Garet", ui-sans-serif, sans-serif;
-  --font-caption: "Montserrat", ui-sans-serif, sans-serif;
+  --bg-primary: #000000;
+  --bg-secondary: #0B1117;
 
-  --background: var(--brand-white);
-  --foreground: var(--brand-dark-pine);
-  --card: var(--brand-white);
-  --card-foreground: var(--brand-dark-pine);
-  --popover: var(--brand-white);
-  --popover-foreground: var(--brand-dark-pine);
-  --primary: var(--brand-sage);
-  --primary-foreground: var(--brand-white);
-  --secondary: var(--brand-sage-muted);
-  --secondary-foreground: var(--brand-dark-pine);
-  --muted: var(--brand-sage-subtle);
-  --muted-foreground: var(--brand-pine-muted);
-  --accent: var(--brand-sage-muted);
-  --accent-foreground: var(--brand-sage);
-  --destructive: #B91C1C;
-  --destructive-foreground: var(--brand-white);
-  --border: var(--brand-border-subtle);
-  --input: var(--brand-border-light);
-  --ring: var(--brand-sage);
-  --chart-1: var(--brand-sage);
-  --chart-2: var(--brand-pine-muted);
-  --chart-3: #5A9F7A;
-  --chart-4: #2D6B4A;
-  --chart-5: var(--brand-dark-pine);
-  --sidebar: var(--brand-dark-pine);
-  --sidebar-foreground: var(--brand-white);
-  --sidebar-primary: var(--brand-sage);
-  --sidebar-primary-foreground: var(--brand-white);
-  --sidebar-accent: #142828;
-  --sidebar-accent-foreground: var(--brand-white);
-  --sidebar-border: #0F2626;
-  --sidebar-ring: var(--brand-sage);
-  --font-sans: var(--font-caption);
-  --font-display: var(--font-heading);
-  --font-serif: Koh Santepheap, ui-serif, serif;
-  --font-mono: 'Fira Code', monospace;
-  --radius: 0.5rem;
-  --shadow-x: 0rem;
-  --shadow-y: 1px;
-  --shadow-blur: 4px;
-  --shadow-spread: 0px;
-  --shadow-opacity: 0.06;
-  --shadow-color: var(--brand-dark-pine);
-  --shadow-2xs: 0 1px 2px hsl(180 25% 10% / 0.04);
-  --shadow-xs: 0 1px 3px hsl(180 25% 10% / 0.06);
-  --shadow-sm: 0 1px 3px hsl(180 25% 10% / 0.06), 0 2px 6px -2px hsl(180 25% 10% / 0.08);
-  --shadow: 0 2px 4px hsl(180 25% 10% / 0.06), 0 4px 8px -2px hsl(180 25% 10% / 0.08);
-  --shadow-md: 0 4px 6px -2px hsl(180 25% 10% / 0.06), 0 6px 12px -4px hsl(180 25% 10% / 0.08);
-  --shadow-lg: 0 8px 16px -4px hsl(180 25% 10% / 0.08), 0 12px 24px -8px hsl(180 25% 10% / 0.06);
-  --shadow-xl: 0 16px 32px -8px hsl(180 25% 10% / 0.10);
-  --shadow-2xl: 0 24px 48px -12px hsl(180 25% 10% / 0.12);
-  --tracking-normal: 0em;
-  --spacing: 0.25rem;
-}
+  --accent-green: #B7F000;
+  --accent-blue: #1A8BFF;
 
-.dark {
-  --background: var(--brand-dark-pine);
-  --foreground: var(--brand-white);
-  --card: #0F2626;
-  --card-foreground: var(--brand-white);
-  --popover: #0F2626;
-  --popover-foreground: var(--brand-white);
-  --primary: var(--brand-sage);
-  --primary-foreground: var(--brand-white);
-  --secondary: #142828;
-  --secondary-foreground: var(--brand-white);
-  --muted: #142828;
-  --muted-foreground: #9CAEAA;
-  --accent: #1A3333;
-  --accent-foreground: var(--brand-white);
+  --text-primary: #FFFFFF;
+  --text-secondary: #C9D1D9;
+
+  --font-heading: "Blender Pro", sans-serif;
+  --font-body: "Poppins", sans-serif;
+
+  /* Map to semantic tokens used by components */
+  --background: var(--bg-primary);
+  --foreground: var(--text-primary);
+  --card: var(--bg-secondary);
+  --card-foreground: var(--text-primary);
+  --popover: var(--bg-secondary);
+  --popover-foreground: var(--text-primary);
+  --primary: var(--accent-green);
+  --primary-foreground: #000000;
+  --secondary: var(--bg-secondary);
+  --secondary-foreground: var(--text-primary);
+  --muted: #161B22;
+  --muted-foreground: var(--text-secondary);
+  --accent: #161B22;
+  --accent-foreground: var(--text-primary);
   --destructive: #DC2626;
-  --destructive-foreground: var(--brand-white);
-  --border: #1A3333;
-  --input: #142828;
-  --ring: var(--brand-sage);
-  --chart-1: var(--brand-sage);
-  --chart-2: #5A9F7A;
-  --chart-3: #9CAEAA;
-  --chart-4: #3D5C5C;
-  --chart-5: var(--brand-white);
-  --sidebar: var(--brand-dark-pine);
-  --sidebar-foreground: var(--brand-white);
-  --sidebar-primary: var(--brand-sage);
-  --sidebar-primary-foreground: var(--brand-white);
-  --sidebar-accent: #142828;
-  --sidebar-accent-foreground: var(--brand-white);
-  --sidebar-border: #0F2626;
-  --sidebar-ring: var(--brand-sage);
-  --font-sans: var(--font-caption);
+  --destructive-foreground: var(--text-primary);
+  --border: #30363D;
+  --input: #21262D;
+  --ring: var(--accent-blue);
+  --chart-1: var(--accent-green);
+  --chart-2: var(--accent-blue);
+  --chart-3: #58A6FF;
+  --chart-4: #3FB950;
+  --chart-5: var(--text-secondary);
+  --sidebar: var(--bg-secondary);
+  --sidebar-foreground: var(--text-primary);
+  --sidebar-primary: var(--accent-green);
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #21262D;
+  --sidebar-accent-foreground: var(--text-primary);
+  --sidebar-border: #30363D;
+  --sidebar-ring: var(--accent-blue);
+  --font-sans: var(--font-body);
   --font-display: var(--font-heading);
-  --font-serif: Koh Santepheap, ui-serif, serif;
-  --font-mono: 'Fira Code', monospace;
+  --font-caption: var(--font-body);
+  --font-serif: ui-serif, serif;
+  --font-mono: ui-monospace, monospace;
   --radius: 0.5rem;
   --shadow-x: 0rem;
   --shadow-y: 2px;
   --shadow-blur: 8px;
   --shadow-spread: 0px;
-  --shadow-opacity: 0.2;
+  --shadow-opacity: 0.25;
   --shadow-color: #000000;
-  --shadow-2xs: 0 1px 2px hsl(0 0% 0% / 0.15);
-  --shadow-xs: 0 2px 4px hsl(0 0% 0% / 0.15);
-  --shadow-sm: 0 2px 6px -2px hsl(0 0% 0% / 0.2);
-  --shadow: 0 4px 12px -4px hsl(0 0% 0% / 0.2);
-  --shadow-md: 0 8px 20px -6px hsl(0 0% 0% / 0.22);
-  --shadow-lg: 0 16px 32px -8px hsl(0 0% 0% / 0.25);
-  --shadow-xl: 0 24px 48px -12px hsl(0 0% 0% / 0.28);
-  --shadow-2xl: 0 32px 64px -16px hsl(0 0% 0% / 0.3);
+  --shadow-2xs: 0 1px 2px hsl(0 0% 0% / 0.2);
+  --shadow-xs: 0 2px 4px hsl(0 0% 0% / 0.2);
+  --shadow-sm: 0 2px 6px -2px hsl(0 0% 0% / 0.25);
+  --shadow: 0 4px 12px -4px hsl(0 0% 0% / 0.25);
+  --shadow-md: 0 8px 20px -6px hsl(0 0% 0% / 0.28);
+  --shadow-lg: 0 16px 32px -8px hsl(0 0% 0% / 0.3);
+  --shadow-xl: 0 24px 48px -12px hsl(0 0% 0% / 0.32);
+  --shadow-2xl: 0 32px 64px -16px hsl(0 0% 0% / 0.35);
+  --tracking-normal: 0em;
+  --spacing: 0.25rem;
 }
 
 @theme inline {
@@ -185,7 +131,14 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    color-scheme: dark;
+  }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-body);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
   }
 }
