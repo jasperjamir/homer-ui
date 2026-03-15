@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Shared/components/ui/card";
 import { Button } from "@/Shared/components/ui/button";
-import { Textarea } from "@/Shared/components/ui/textarea";
 import { ArrowLeft } from "lucide-react";
 import {
   getVideoGenerationQueryOptions,
@@ -12,13 +11,18 @@ import {
   useGenerateVideoFromStoryboardMutation,
   useUpdateStoryboardMutation,
 } from "@/Features/VideoGenerations/query-options";
+import { StoryboardEditor } from "@/Features/VideoGenerations/components/StoryboardEditor";
+import {
+  parseStoryboardContent,
+  storyboardContentToRecord,
+} from "@/Features/VideoGenerations/models";
 import { useNavigate } from "react-router";
 import { ROUTES, videoGenerationDetail } from "@/Shared/utils/routes.util";
 
 export default function VideoGenerationStoryboardPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [localContent, setLocalContent] = useState<string>("");
+  const [localContent, setLocalContent] = useState<ReturnType<typeof parseStoryboardContent> | null>(null);
 
   const { data: generation, isLoading: genLoading } = useQuery(
     getVideoGenerationQueryOptions(id ?? "")
@@ -28,7 +32,7 @@ export default function VideoGenerationStoryboardPage() {
   );
 
   useEffect(() => {
-    if (storyboard) setLocalContent(JSON.stringify(storyboard.content, null, 2));
+    if (storyboard) setLocalContent(parseStoryboardContent(storyboard.content));
   }, [storyboard?.id]);
 
   const updateMutation = useUpdateStoryboardMutation(id ?? "", {
@@ -46,19 +50,20 @@ export default function VideoGenerationStoryboardPage() {
   const isPending = updateMutation.isPending || generateMutation.isPending;
 
   const handleSaveAndGenerate = async () => {
+    if (!id || !storyboard || !localContent) return;
+    if (localContent.frames.length === 0) {
+      toast.error("Add at least one frame before generating.");
+      return;
+    }
     try {
-      const parsed = JSON.parse(localContent || "{}") as Record<string, unknown>;
-      if (!id || !storyboard) return;
-      await updateMutation.mutateAsync(parsed);
+      const record = storyboardContentToRecord(localContent);
+      await updateMutation.mutateAsync(record);
       generateMutation.mutate({
         videoGenerationStoryboardId: storyboard.id,
-        storyboard: parsed,
+        storyboard: record,
         videoGenerationId: id,
       });
-    } catch (e) {
-      if (e instanceof SyntaxError) {
-        toast.error("Invalid JSON. Fix the storyboard before generating.");
-      }
+    } catch {
       // Mutation errors are handled by onError
     }
   };
@@ -80,7 +85,7 @@ export default function VideoGenerationStoryboardPage() {
         <CardHeader>
           <CardTitle>Step 2: Storyboard</CardTitle>
           <p className="text-muted-foreground text-sm">
-            Edit the storyboard JSON, then click Save storyboard and generate video.
+            Edit each frame below, then click Save storyboard and generate video.
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -89,14 +94,11 @@ export default function VideoGenerationStoryboardPage() {
               <div className="size-8 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
               <span>Generating storyboard...</span>
             </div>
-          ) : (
+          ) : localContent ? (
             <>
-              <Textarea
-                value={localContent || "{}"}
-                onChange={(e) => setLocalContent(e.target.value)}
-                rows={16}
-                className="font-mono text-sm resize-y"
-                placeholder='{"frames": [...]}'
+              <StoryboardEditor
+                content={localContent}
+                onChange={setLocalContent}
               />
               <Button
                 onClick={handleSaveAndGenerate}
@@ -105,7 +107,7 @@ export default function VideoGenerationStoryboardPage() {
                 {isPending ? "Saving & generating…" : "Save storyboard and generate video"}
               </Button>
             </>
-          )}
+          ) : null}
         </CardContent>
       </Card>
     </div>

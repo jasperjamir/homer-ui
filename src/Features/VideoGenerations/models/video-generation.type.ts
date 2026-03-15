@@ -47,6 +47,37 @@ export interface GenerateVideoFromStoryboardRequest {
   videoGenerationId: string;
 }
 
+/** A single frame in the storyboard */
+export interface StoryboardFrame {
+  scene: string;
+  duration: number;
+  description: string;
+}
+
+/** Storyboard content structure */
+export interface StoryboardContent {
+  frames: StoryboardFrame[];
+}
+
+/** Parse content to StoryboardContent; returns empty frames if invalid */
+export function parseStoryboardContent(content: Record<string, unknown>): StoryboardContent {
+  const raw = content?.frames;
+  if (!Array.isArray(raw)) return { frames: [] };
+  const frames: StoryboardFrame[] = raw
+    .filter((f): f is Record<string, unknown> => f != null && typeof f === "object")
+    .map((f) => ({
+      scene: typeof f.scene === "string" ? f.scene : "",
+      duration: typeof f.duration === "number" ? f.duration : 2,
+      description: typeof f.description === "string" ? f.description : "",
+    }));
+  return { frames };
+}
+
+/** Convert StoryboardContent back to Record for API */
+export function storyboardContentToRecord(content: StoryboardContent): Record<string, unknown> {
+  return { frames: content.frames };
+}
+
 /** Default mock storyboard structure for MVP */
 export const MOCK_STORYBOARD_CONTENT: Record<string, unknown> = {
   frames: [
