@@ -1,0 +1,433 @@
+-- =====================================================
+-- SEED: UNIT / CHAPTERS / LESSONS / ACTIVITIES / USERS / LOGS
+-- =====================================================
+
+begin;
+
+-- =====================================================
+-- 1. CREATE OR GET UNIT
+-- =====================================================
+with inserted_unit as (
+  insert into public.units (name, description)
+  values (
+    'Unit 1',
+    'Introduction to Software Development'
+  )
+  returning id
+)
+select id from inserted_unit;
+
+-- =====================================================
+-- 2. CREATE OR GET DUMMY AUTH USERS
+-- NOTE:
+-- This assumes your project allows inserting into auth.users directly.
+-- If these emails already exist, this script will fail on duplicate email.
+-- Change the emails if needed.
+-- =====================================================
+
+with student_auth as (
+  insert into auth.users (
+    id,
+    instance_id,
+    aud,
+    role,
+    email,
+    encrypted_password,
+    email_confirmed_at,
+    raw_app_meta_data,
+    raw_user_meta_data,
+    created_at,
+    updated_at,
+    confirmation_token,
+    email_change,
+    email_change_token_new,
+    recovery_token
+  )
+  values (
+    gen_random_uuid(),
+    '00000000-0000-0000-0000-000000000000',
+    'authenticated',
+    'authenticated',
+    'student.seed@test.com',
+    crypt('password123', gen_salt('bf')),
+    now(),
+    '{"provider":"email","providers":["email"]}'::jsonb,
+    '{}'::jsonb,
+    now(),
+    now(),
+    '',
+    '',
+    '',
+    ''
+  )
+  returning id, email
+),
+educator_auth as (
+  insert into auth.users (
+    id,
+    instance_id,
+    aud,
+    role,
+    email,
+    encrypted_password,
+    email_confirmed_at,
+    raw_app_meta_data,
+    raw_user_meta_data,
+    created_at,
+    updated_at,
+    confirmation_token,
+    email_change,
+    email_change_token_new,
+    recovery_token
+  )
+  values (
+    gen_random_uuid(),
+    '00000000-0000-0000-0000-000000000000',
+    'authenticated',
+    'authenticated',
+    'educator.seed@test.com',
+    crypt('password123', gen_salt('bf')),
+    now(),
+    '{"provider":"email","providers":["email"]}'::jsonb,
+    '{}'::jsonb,
+    now(),
+    now(),
+    '',
+    '',
+    '',
+    ''
+  )
+  returning id, email
+)
+select 1;
+
+-- =====================================================
+-- 3. CREATE APP USERS
+-- =====================================================
+
+insert into public.app_users (
+  id,
+  name,
+  email,
+  mobile_number,
+  role
+)
+select
+  u.id,
+  'Seed Student',
+  u.email,
+  '09170000001',
+  'STUDENT'
+from auth.users u
+where u.email = 'student.seed@test.com';
+
+insert into public.app_users (
+  id,
+  name,
+  email,
+  mobile_number,
+  role
+)
+select
+  u.id,
+  'Seed Educator',
+  u.email,
+  '09170000002',
+  'EDUCATOR'
+from auth.users u
+where u.email = 'educator.seed@test.com';
+
+-- =====================================================
+-- 4. CREATE CHAPTERS
+-- =====================================================
+
+insert into public.chapters (unit_id, name, description, sort_order)
+values
+(
+  (select id from public.units where name = 'Unit 1' limit 1),
+  'Chapter 1',
+  'Foundations',
+  1
+),
+(
+  (select id from public.units where name = 'Unit 1' limit 1),
+  'Chapter 2',
+  'Next Steps',
+  2
+);
+
+-- =====================================================
+-- 5. CREATE LESSONS
+-- =====================================================
+
+insert into public.lessons (chapter_id, name, description, sort_order)
+values
+(
+  (select id from public.chapters where name = 'Chapter 1' and sort_order = 1 limit 1),
+  'Lesson 1',
+  'Introduction to the course',
+  1
+),
+(
+  (select id from public.chapters where name = 'Chapter 1' and sort_order = 1 limit 1),
+  'Lesson 2',
+  'Basic setup and first steps',
+  2
+),
+(
+  (select id from public.chapters where name = 'Chapter 2' and sort_order = 2 limit 1),
+  'Lesson 3',
+  'Intermediate concepts',
+  1
+),
+(
+  (select id from public.chapters where name = 'Chapter 2' and sort_order = 2 limit 1),
+  'Lesson 4',
+  'Final practice',
+  2
+);
+
+-- =====================================================
+-- 6. CREATE ACTIVITIES
+-- Two activities per lesson
+-- =====================================================
+
+insert into public.activities (lesson_id, name, description, url, sort_order)
+values
+-- Lesson 1
+(
+  (select id from public.lessons where name = 'Lesson 1' and sort_order = 1 limit 1),
+  'Lesson 1 - Activity 1',
+  'Read the introduction',
+  'https://example.com/lesson-1-activity-1',
+  1
+),
+(
+  (select id from public.lessons where name = 'Lesson 1' and sort_order = 1 limit 1),
+  'Lesson 1 - Activity 2',
+  'Submit a short reflection',
+  'https://example.com/lesson-1-activity-2',
+  2
+),
+
+-- Lesson 2
+(
+  (select id from public.lessons where name = 'Lesson 2' and sort_order = 2 limit 1),
+  'Lesson 2 - Activity 1',
+  'Install required tools',
+  'https://example.com/lesson-2-activity-1',
+  1
+),
+(
+  (select id from public.lessons where name = 'Lesson 2' and sort_order = 2 limit 1),
+  'Lesson 2 - Activity 2',
+  'Upload setup proof',
+  'https://example.com/lesson-2-activity-2',
+  2
+),
+
+-- Lesson 3
+(
+  (select id from public.lessons where name = 'Lesson 3' and sort_order = 1 limit 1),
+  'Lesson 3 - Activity 1',
+  'Read intermediate material',
+  'https://example.com/lesson-3-activity-1',
+  1
+),
+(
+  (select id from public.lessons where name = 'Lesson 3' and sort_order = 1 limit 1),
+  'Lesson 3 - Activity 2',
+  'Answer practice questions',
+  'https://example.com/lesson-3-activity-2',
+  2
+),
+
+-- Lesson 4
+(
+  (select id from public.lessons where name = 'Lesson 4' and sort_order = 2 limit 1),
+  'Lesson 4 - Activity 1',
+  'Build final exercise',
+  'https://example.com/lesson-4-activity-1',
+  1
+),
+(
+  (select id from public.lessons where name = 'Lesson 4' and sort_order = 2 limit 1),
+  'Lesson 4 - Activity 2',
+  'Submit final output',
+  'https://example.com/lesson-4-activity-2',
+  2
+);
+
+-- =====================================================
+-- 7. CREATE STUDENT / EDUCATOR RECORDS
+-- =====================================================
+
+insert into public.students (
+  user_id,
+  unit_id
+)
+values (
+  (select id from public.app_users where email = 'student.seed@test.com' limit 1),
+  (select id from public.units where name = 'Unit 1' limit 1)
+);
+
+insert into public.educators (
+  user_id,
+  unit_id,
+  expertise,
+  years_experience
+)
+values (
+  (select id from public.app_users where email = 'educator.seed@test.com' limit 1),
+  (select id from public.units where name = 'Unit 1' limit 1),
+  'Software Engineering',
+  5
+);
+
+-- =====================================================
+-- 8. CREATE STUDENT LOGS
+-- Lesson 1: fully approved
+-- Lesson 2: unlocked and partially worked on
+-- Lesson 3+: untouched
+-- =====================================================
+
+insert into public.student_logs (
+  student_id,
+  activity_id,
+  submission_link,
+  submission_details,
+  submission_date,
+  status,
+  approval_date,
+  approver_id
+)
+values
+-- Lesson 1 Activity 1 -> APPROVED
+(
+  (select id from public.students limit 1),
+  (select a.id
+   from public.activities a
+   join public.lessons l on l.id = a.lesson_id
+   where l.name = 'Lesson 1' and a.sort_order = 1
+   limit 1),
+  'https://example.com/submission/l1a1',
+  'Completed reading and notes.',
+  now() - interval '4 days',
+  'APPROVED',
+  now() - interval '3 days',
+  (select id from public.educators limit 1)
+),
+
+-- Lesson 1 Activity 2 -> APPROVED
+(
+  (select id from public.students limit 1),
+  (select a.id
+   from public.activities a
+   join public.lessons l on l.id = a.lesson_id
+   where l.name = 'Lesson 1' and a.sort_order = 2
+   limit 1),
+  'https://example.com/submission/l1a2',
+  'Submitted reflection.',
+  now() - interval '3 days',
+  'APPROVED',
+  now() - interval '2 days',
+  (select id from public.educators limit 1)
+),
+
+-- Lesson 2 Activity 1 -> IN_PROGRESS
+(
+  (select id from public.students limit 1),
+  (select a.id
+   from public.activities a
+   join public.lessons l on l.id = a.lesson_id
+   where l.name = 'Lesson 2' and a.sort_order = 1
+   limit 1),
+  null,
+  'Started installing required tools.',
+  now() - interval '1 day',
+  'IN_PROGRESS',
+  null,
+  null
+),
+
+-- Lesson 2 Activity 2 -> FOR_APPROVAL
+(
+  (select id from public.students limit 1),
+  (select a.id
+   from public.activities a
+   join public.lessons l on l.id = a.lesson_id
+   where l.name = 'Lesson 2' and a.sort_order = 2
+   limit 1),
+  'https://example.com/submission/l2a2',
+  'Uploaded setup proof.',
+  now() - interval '12 hours',
+  'FOR_APPROVAL',
+  null,
+  null
+),
+
+-- Lesson 3 Activity 1 -> TODO
+(
+  (select id from public.students limit 1),
+  (select a.id
+   from public.activities a
+   join public.lessons l on l.id = a.lesson_id
+   where l.name = 'Lesson 3' and a.sort_order = 1
+   limit 1),
+  null,
+  null,
+  null,
+  'TODO',
+  null,
+  null
+),
+
+-- Lesson 3 Activity 2 -> TODO
+(
+  (select id from public.students limit 1),
+  (select a.id
+   from public.activities a
+   join public.lessons l on l.id = a.lesson_id
+   where l.name = 'Lesson 3' and a.sort_order = 2
+   limit 1),
+  null,
+  null,
+  null,
+  'TODO',
+  null,
+  null
+),
+
+-- Lesson 4 Activity 1 -> TODO
+(
+  (select id from public.students limit 1),
+  (select a.id
+   from public.activities a
+   join public.lessons l on l.id = a.lesson_id
+   where l.name = 'Lesson 4' and a.sort_order = 1
+   limit 1),
+  null,
+  null,
+  null,
+  'TODO',
+  null,
+  null
+),
+
+-- Lesson 4 Activity 2 -> TODO
+(
+  (select id from public.students limit 1),
+  (select a.id
+   from public.activities a
+   join public.lessons l on l.id = a.lesson_id
+   where l.name = 'Lesson 4' and a.sort_order = 2
+   limit 1),
+  null,
+  null,
+  null,
+  'TODO',
+  null,
+  null
+);
+
+commit;
