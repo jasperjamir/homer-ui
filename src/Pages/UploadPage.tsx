@@ -134,22 +134,17 @@ export default function UploadPage() {
       return;
     }
     setUploading(true);
+    const uploadToastId = "upload-selected-assets";
+    toast.loading("Upload command sent. You can check again in a few seconds...", { id: uploadToastId });
     try {
-      const result = await uploadSelectedAssets(assets, connectedAccounts, checked);
-      const total = result.success + result.failed;
-      if (result.failed === 0) {
-        toast.success(
-          `Finished uploading ${result.success} item${result.success === 1 ? "" : "s"} to your platforms`,
-        );
-      } else if (result.success > 0) {
-        toast.warning(
-          `Uploaded ${result.success} of ${total}; ${result.failed} failed. ${result.errors.slice(0, 2).join(" ")}`,
-        );
-      } else {
-        toast.error(result.errors[0] ?? "Upload failed");
-      }
+      await uploadSelectedAssets(assets, connectedAccounts, checked);
+
+      // TODO: Backend currently appears to return only an "accepted/received" style response.
+      // When we have per-command statuses (uploaded/failed), render them here (e.g. in a table or list)
+      // and update the toast accordingly.
+      toast.success("Upload command received. Just check in a few seconds.", { id: uploadToastId });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Upload failed");
+      toast.error(err instanceof Error ? err.message : "Upload failed", { id: uploadToastId });
     } finally {
       setUploading(false);
     }
