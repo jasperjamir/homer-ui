@@ -3,6 +3,8 @@ import type {
   GenerateVideoFromStoryboardRequest,
   VideoGeneration,
   VideoGenerationAsset,
+  VideoGenerationAssetsResponse,
+  VideoGenerationPolledAsset,
   VideoGenerationStoryboard,
 } from "@/Features/VideoGenerations/models";
 import { api } from "@/Shared/services/api";
@@ -43,6 +45,17 @@ function toVideoGenerationAsset(row: Record<string, unknown>): VideoGenerationAs
   };
 }
 
+function toVideoGenerationPolledAsset(row: Record<string, unknown>): VideoGenerationPolledAsset {
+  return {
+    id: row.id as string,
+    videoGenerationId: row.videoGenerationId as string,
+    index: row.index as number,
+    status: (row.status as VideoGenerationPolledAsset["status"]) ?? null,
+    pollingRequestId: (row.pollingRequestId as string | null) ?? null,
+    assetUrl: (row.assetUrl as string | null) ?? null,
+  };
+}
+
 export async function getVideoGenerations(): Promise<VideoGeneration[]> {
   const { data, error } = await supabase
     .from("video_generations")
@@ -63,6 +76,27 @@ export async function getVideoGenerationById(id: string): Promise<VideoGeneratio
     throw error;
   }
   return data ? toVideoGeneration(data) : null;
+}
+
+export async function getVideoGenerationAssetsByGenerationId(
+  videoGenerationId: string,
+): Promise<VideoGenerationAssetsResponse> {
+  const { data } = await api.get<VideoGenerationAssetsResponse>(
+    `/video/generations/${videoGenerationId}/assets`,
+  );
+  return {
+    id: data.id,
+    assets: (data.assets ?? []).map((asset) =>
+      toVideoGenerationPolledAsset(asset as unknown as Record<string, unknown>)
+    ),
+  };
+}
+
+export async function getVideoAssetStatusById(
+  assetId: string,
+): Promise<VideoGenerationPolledAsset> {
+  const { data } = await api.get<VideoGenerationPolledAsset>(`/video/assets/${assetId}`);
+  return toVideoGenerationPolledAsset(data as unknown as Record<string, unknown>);
 }
 
 export async function getVideoGenerationStoryboard(

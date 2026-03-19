@@ -28,6 +28,57 @@ export interface VideoGenerationAsset {
   createdAt: string;
 }
 
+export type VideoAssetStatusValue =
+  | "queued"
+  | "in_progress"
+  | "success"
+  | "failed"
+  | "expired";
+
+/** Asset shape returned by /video/generations/:id/assets and /video/assets/:assetId */
+export interface VideoGenerationPolledAsset {
+  id: string;
+  videoGenerationId: string;
+  index: number;
+  status: VideoAssetStatusValue | null;
+  pollingRequestId: string | null;
+  assetUrl: string | null;
+}
+
+/** Response shape returned by /video/generations/:id/assets */
+export interface VideoGenerationAssetsResponse {
+  id: string;
+  assets: VideoGenerationPolledAsset[];
+}
+
+export type VideoGenerationStatusValue =
+  | "pending"
+  | "storyboard"
+  | "success"
+  | "failed";
+
+export type VideoGenerationAssetStatusValue =
+  | "queued"
+  | "in_progress"
+  | "success"
+  | "failed"
+  | "expired";
+
+export interface VideoGenerationStatusAsset {
+  id: string;
+  index: number;
+  status: VideoGenerationAssetStatusValue | null;
+  pollingRequestId: string | null;
+  url: string | null;
+}
+
+export interface VideoGenerationStatus {
+  id: string;
+  status: VideoGenerationStatusValue;
+  storyboardId: string | null;
+  assets: VideoGenerationStatusAsset[];
+}
+
 export type VideoGenerationInsert = Omit<
   VideoGeneration,
   "id" | "createdAt" | "updatedAt"

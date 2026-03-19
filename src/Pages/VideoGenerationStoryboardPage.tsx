@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Shared/components/ui/card";
 import { Button } from "@/Shared/components/ui/button";
 import {
-  getVideoGenerationAssetsQueryOptions,
+  getVideoGenerationAssetsListQueryOptions,
   getVideoGenerationQueryOptions,
   getVideoGenerationStoryboardWithPollingQueryOptions,
   useGenerateVideoFromStoryboardMutation,
@@ -31,11 +31,15 @@ export default function VideoGenerationStoryboardPage() {
   const { data: storyboard, isLoading: sbLoading } = useQuery(
     getVideoGenerationStoryboardWithPollingQueryOptions(id ?? "")
   );
-  const { data: assets } = useQuery(
-    getVideoGenerationAssetsQueryOptions(id ?? "")
+  const { data: generationAssetsData } = useQuery(
+    getVideoGenerationAssetsListQueryOptions(id ?? "")
   );
 
-  const hasGeneratedVideo = (assets?.length ?? 0) > 0;
+  const hasGeneratedVideo = (generationAssetsData?.assets ?? []).some((asset) =>
+    Boolean(asset.assetUrl) ||
+    Boolean(asset.pollingRequestId) ||
+    (asset.status != null && asset.status !== "queued")
+  );
 
   useEffect(() => {
     if (storyboard) setLocalContent(parseStoryboardContent(storyboard.content));
