@@ -36,7 +36,10 @@ export function getUploadPlatformCountQueryOptions() {
   });
 }
 
-export function useCreateUploadPlatformMutation(options?: { onSuccess?: () => void }) {
+export function useCreateUploadPlatformMutation(options?: {
+  onSuccess?: () => void;
+  onError?: (e: Error) => void;
+}) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: UploadPlatformInsert) => createUploadPlatform(input),
@@ -45,11 +48,16 @@ export function useCreateUploadPlatformMutation(options?: { onSuccess?: () => vo
       qc.invalidateQueries({ queryKey: ["upload-platforms", "count"] });
       options?.onSuccess?.();
     },
+    onError: (e) => {
+      const err = e instanceof Error ? e : new Error(String(e));
+      options?.onError?.(err);
+    },
   });
 }
 
 export function useUpdateUploadPlatformMutation(options?: {
   onSuccess?: (data: UploadPlatform) => void;
+  onError?: (e: Error) => void;
 }) {
   const qc = useQueryClient();
   return useMutation({
@@ -60,10 +68,17 @@ export function useUpdateUploadPlatformMutation(options?: {
       qc.invalidateQueries({ queryKey: ["upload-platform", data.id] });
       options?.onSuccess?.(data);
     },
+    onError: (e) => {
+      const err = e instanceof Error ? e : new Error(String(e));
+      options?.onError?.(err);
+    },
   });
 }
 
-export function useDeleteUploadPlatformMutation(options?: { onSuccess?: () => void }) {
+export function useDeleteUploadPlatformMutation(options?: {
+  onSuccess?: () => void;
+  onError?: (e: Error) => void;
+}) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => deleteUploadPlatform(id),
@@ -71,6 +86,10 @@ export function useDeleteUploadPlatformMutation(options?: { onSuccess?: () => vo
       qc.invalidateQueries({ queryKey: ["upload-platforms"] });
       qc.invalidateQueries({ queryKey: ["upload-platforms", "count"] });
       options?.onSuccess?.();
+    },
+    onError: (e) => {
+      const err = e instanceof Error ? e : new Error(String(e));
+      options?.onError?.(err);
     },
   });
 }
