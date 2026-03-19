@@ -22,6 +22,16 @@ export default function PlatformsPage() {
     return map[platform] ?? platform;
   };
 
+  const getAccountUrl = (platform: string, username: string): string | null => {
+    const handle = username.trim().replace(/^@/, "");
+    if (!handle) return null;
+
+    if (platform === "tiktok") return `https://www.tiktok.com/@${handle}`;
+    if (platform === "instagram") return `https://www.instagram.com/${handle}/`;
+
+    return null;
+  };
+
   const handleAddPlatforms = useCallback(() => {
     window.open("https://my.blotato.com/", "_blank", "noopener,noreferrer");
   }, []);
@@ -46,19 +56,18 @@ export default function PlatformsPage() {
             <TableRow>
               <TableHead>Platform</TableHead>
               <TableHead>Username</TableHead>
-              <TableHead>Full name</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={3} className="py-8 text-center text-muted-foreground">
+                <TableCell colSpan={2} className="py-8 text-center text-muted-foreground">
                   Loading...
                 </TableCell>
               </TableRow>
             ) : connectedAccounts.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={3} className="py-8 text-center text-muted-foreground">
+                <TableCell colSpan={2} className="py-8 text-center text-muted-foreground">
                   No connected accounts yet.
                 </TableCell>
               </TableRow>
@@ -67,10 +76,27 @@ export default function PlatformsPage() {
                 <TableRow key={a.id}>
                   <TableCell>{formatConnectedPlatform(a.platform)}</TableCell>
                   <TableCell>
-                    {a.username || <span className="text-muted-foreground">N/A</span>}
-                  </TableCell>
-                  <TableCell>
-                    {a.fullname || <span className="text-muted-foreground">N/A</span>}
+                    {a.username ? (
+                      (() => {
+                        const url = getAccountUrl(a.platform, a.username);
+                        return url ? (
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-accent-blue hover:underline"
+                          >
+                            @{a.username.replace(/^@/, "")}
+                          </a>
+                        ) : (
+                          <span className="text-muted-foreground">
+                            @{a.username.replace(/^@/, "")}
+                          </span>
+                        );
+                      })()
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )}
                   </TableCell>
                 </TableRow>
               ))
