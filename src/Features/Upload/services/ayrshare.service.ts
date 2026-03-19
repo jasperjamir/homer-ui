@@ -1,6 +1,5 @@
 import type { PoolAsset } from "@/Features/Upload/models";
-import type { UploadPlatform } from "@/Features/UploadPlatforms/models";
-import type { PlatformType } from "@/Features/PlatformTypes/models";
+import type { ConnectedPlatformAccount } from "@/Features/Accounts/models";
 
 const AYRSHARE_POST_URL = "https://api.ayrshare.com/api/post";
 
@@ -88,12 +87,14 @@ export async function postToAyrshare(body: AyrsharePostBody): Promise<AyrsharePo
   return data;
 }
 
-/** Map platform_type code (INSTAGRAM, TIKTOK) to Ayrshare platform name (instagram, tiktok). */
+/** Map platform values to Ayrshare platform name (instagram, tiktok). */
 const AYRSHARE_PLATFORMS = new Set(["instagram", "tiktok"]);
 
 function platformCodeToAyrshare(code: string): string | null {
-  const name = code.toLowerCase();
-  return AYRSHARE_PLATFORMS.has(name) ? name : null;
+  const normalized = code.trim().toLowerCase();
+  if (normalized === "ig") return "instagram";
+  if (AYRSHARE_PLATFORMS.has(normalized)) return normalized;
+  return null;
 }
 
 export interface UploadSelectedResult {
@@ -108,13 +109,28 @@ export interface UploadSelectedResult {
  */
 export async function uploadSelectedAssets(
   assets: PoolAsset[],
-  platforms: UploadPlatform[],
-  platformTypes: PlatformType[],
+  platforms: ConnectedPlatformAccount[],
   checked: Set<string>,
+): Promise<UploadSelectedResult>;
+// Backwards-compatible overload: older code paths passed platformTypes as a third argument.
+export async function uploadSelectedAssets(
+  assets: PoolAsset[],
+  platforms: ConnectedPlatformAccount[],
+  _platformTypes: unknown,
+  checked: Set<string>,
+): Promise<UploadSelectedResult>;
+export async function uploadSelectedAssets(
+  assets: PoolAsset[],
+  platforms: ConnectedPlatformAccount[],
+  third: Set<string> | unknown,
+  fourth?: Set<string>,
 ): Promise<UploadSelectedResult> {
+  const checked = third instanceof Set ? third : fourth;
+  if (!checked) {
+    throw new Error("uploadSelectedAssets: missing checked platforms set");
+  }
   const result: UploadSelectedResult = { success: 0, failed: 0, errors: [] };
   const platformById = new Map(platforms.map((p) => [p.id, p]));
-  const platformTypeById = new Map(platformTypes.map((t) => [t.id, t]));
 
   const byAsset = new Map<string, { asset: PoolAsset; platformIds: Set<string> }>();
   for (const k of checked) {
@@ -137,9 +153,7 @@ export async function uploadSelectedAssets(
     for (const pid of platformIds) {
       const platform = platformById.get(pid);
       if (!platform) continue;
-      const pt = platformTypeById.get(platform.platform_type_id);
-      if (!pt) continue;
-      const name = platformCodeToAyrshare(pt.code);
+      const name = platformCodeToAyrshare(platform.platform);
       if (name && !ayrsharePlatforms.includes(name)) ayrsharePlatforms.push(name);
     }
     if (ayrsharePlatforms.length === 0) {

@@ -23,9 +23,8 @@ import {
   TableRow,
 } from "@/Shared/components/ui/table";
 import { getImageGenerationsQueryOptions } from "@/Features/ImageGenerations/query-options";
+import { getAccountsQueryOptions } from "@/Features/Accounts/query-options";
 import { getVideoGenerationsQueryOptions } from "@/Features/VideoGenerations/query-options";
-import { getUploadPlatformsQueryOptions } from "@/Features/UploadPlatforms/query-options";
-import { getPlatformTypesQueryOptions } from "@/Features/PlatformTypes/query-options";
 import type { PoolAsset } from "@/Features/Upload/models";
 import { getAssetsInRange, uploadSelectedAssets } from "@/Features/Upload/services";
 
@@ -87,10 +86,21 @@ export default function UploadPage() {
   const { data: imageGenerations = [] } = useQuery(getImageGenerationsQueryOptions());
   const { data: videoGenerations = [] } = useQuery(getVideoGenerationsQueryOptions());
   const { data: assets = [], isLoading: assetsLoading } = useAssetsQuery(filterValue);
-  const { data: platforms = [], isLoading: platformsLoading } = useQuery(
-    getUploadPlatformsQueryOptions()
-  );
-  const { data: platformTypes = [] } = useQuery(getPlatformTypesQueryOptions());
+  const { data: connectedAccounts = [], isLoading: accountsLoading } = useQuery(getAccountsQueryOptions());
+
+  const formatConnectedPlatform = (platform: string): string => {
+    const map: Record<string, string> = {
+      tiktok: "TikTok",
+      instagram: "Instagram",
+    };
+    return map[platform] ?? platform;
+  };
+
+  const getAccountColumnLabel = (a: { platform: string; username: string }) => {
+    const handle = a.username?.trim().replace(/^@/, "");
+    if (handle) return handle;
+    return formatConnectedPlatform(a.platform);
+  };
 
   const isGenerationFilter = filterValue && !TIME_FILTER_OPTIONS.some((o) => o.value === filterValue);
   const isVideoGenerationFilter = isGenerationFilter && filterValue.startsWith(VIDEO_PREFIX);
@@ -106,16 +116,15 @@ export default function UploadPage() {
   };
 
   const handleUpload = async () => {
-    if (platformTypes.length === 0 || platforms.length === 0) {
-      toast.error("Platforms or platform types not loaded");
+    if (connectedAccounts.length === 0) {
+      toast.error("No connected accounts loaded");
       return;
     }
     setUploading(true);
     try {
       const result = await uploadSelectedAssets(
         assets,
-        platforms,
-        platformTypes,
+        connectedAccounts,
         checked,
       );
       const total = result.success + result.failed;
@@ -192,11 +201,11 @@ export default function UploadPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {platformsLoading ? (
-            <p className="text-muted-foreground">Loading platforms...</p>
-          ) : platforms.length === 0 ? (
+          {accountsLoading ? (
+            <p className="text-muted-foreground">Loading connected accounts...</p>
+          ) : connectedAccounts.length === 0 ? (
             <p className="text-muted-foreground">
-              Add platforms in the Platforms config first (max 10).
+              Connect accounts in the Platforms config first.
             </p>
           ) : assetsLoading ? (
             <p className="text-muted-foreground">Loading assets...</p>
@@ -214,9 +223,9 @@ export default function UploadPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="min-w-[200px]">Asset</TableHead>
-                    {platforms.map((p) => (
-                      <TableHead key={p.id} className="text-center w-24">
-                        {p.name}
+                    {connectedAccounts.map((a) => (
+                      <TableHead key={a.id} className="text-center w-24">
+                        {a.username ? getAccountColumnLabel(a) : formatConnectedPlatform(a.platform)}
                       </TableHead>
                     ))}
                   </TableRow>
@@ -260,12 +269,12 @@ export default function UploadPage() {
                           </div>
                         )}
                       </TableCell>
-                      {platforms.map((p) => (
-                        <TableCell key={p.id} className="text-center">
+                      {connectedAccounts.map((a) => (
+                        <TableCell key={a.id} className="text-center">
                           <Checkbox
-                            checked={checked.has(key(asset, p.id))}
-                            onCheckedChange={() => toggle(asset, p.id)}
-                            aria-label={`Select ${asset.type} #${asset.index} for ${p.name}`}
+                            checked={checked.has(key(asset, a.id))}
+                            onCheckedChange={() => toggle(asset, a.id)}
+                            aria-label={`Select ${asset.type} #${asset.index} for ${formatConnectedPlatform(a.platform)}`}
                           />
                         </TableCell>
                       ))}
@@ -284,7 +293,7 @@ export default function UploadPage() {
             <div className="mt-4">
               <Button
                 onClick={handleUpload}
-                disabled={checked.size === 0 || uploading}
+                disabled={checked.size === 0 || uploading || connectedAccounts.length === 0}
               >
                 {uploading ? "Uploading…" : "Upload"}
               </Button>
