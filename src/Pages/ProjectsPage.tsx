@@ -72,16 +72,20 @@ export default function ProjectsPage() {
 
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
-    defaultValues: { name: "", prompt_text: "" },
+    defaultValues: { name: "", prompt_text: "", logo_url: "" },
   });
 
   const openEdit = (p: Project) => {
     setEditing(p);
-    form.reset({ name: p.name, prompt_text: p.prompt_text ?? "" });
+    form.reset({
+      name: p.name,
+      prompt_text: p.prompt_text ?? "",
+      logo_url: p.logo_url ?? "",
+    });
   };
   const openCreate = () => {
     setCreateOpen(true);
-    form.reset({ name: "", prompt_text: "" });
+    form.reset({ name: "", prompt_text: "", logo_url: "" });
   };
 
   return (
@@ -102,19 +106,20 @@ export default function ProjectsPage() {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Prompt</TableHead>
+              <TableHead className="w-[100px]">Logo</TableHead>
               <TableHead className="w-[120px] text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
                   Loading...
                 </TableCell>
               </TableRow>
             ) : projects.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
                   No projects yet. Add one to use in generations.
                 </TableCell>
               </TableRow>
@@ -124,6 +129,17 @@ export default function ProjectsPage() {
                   <TableCell className="font-medium">{p.name}</TableCell>
                   <TableCell className="max-w-[200px] truncate text-muted-foreground" title={p.prompt_text ?? undefined}>
                     {p.prompt_text || "—"}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {p.logo_url ? (
+                      <img
+                        src={p.logo_url}
+                        alt={`${p.name} logo`}
+                        className="h-9 w-9 rounded-md border object-cover"
+                      />
+                    ) : (
+                      "—"
+                    )}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
@@ -157,6 +173,7 @@ export default function ProjectsPage() {
               createMutation.mutate({
                 name: data.name,
                 prompt_text: data.prompt_text?.trim() || null,
+                logo_url: data.logo_url?.trim() || null,
               });
             })}
             className="space-y-4"
@@ -170,6 +187,16 @@ export default function ProjectsPage() {
               <FieldLabel>Prompt text</FieldLabel>
               <Textarea {...form.register("prompt_text")} rows={3} className="resize-none max-h-48 overflow-y-auto" placeholder="Optional project-level prompt" />
               <FieldError errors={form.formState.errors.prompt_text ? [form.formState.errors.prompt_text] : undefined} />
+            </Field>
+            <Field>
+              <FieldLabel>Logo URL</FieldLabel>
+              <Input
+                {...form.register("logo_url")}
+                type="url"
+                inputMode="url"
+                placeholder="https://..."
+              />
+              <FieldError errors={form.formState.errors.logo_url ? [form.formState.errors.logo_url] : undefined} />
             </Field>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>
@@ -196,6 +223,7 @@ export default function ProjectsPage() {
                   updates: {
                     name: data.name,
                     prompt_text: data.prompt_text?.trim() || null,
+                    logo_url: data.logo_url?.trim() || null,
                   },
                 });
               })}
@@ -208,8 +236,25 @@ export default function ProjectsPage() {
               </Field>
               <Field>
                 <FieldLabel>Prompt text</FieldLabel>
-<Textarea {...form.register("prompt_text")} rows={3} className="resize-none max-h-48 overflow-y-auto" placeholder="Optional project-level prompt" />
-              <FieldError errors={form.formState.errors.prompt_text ? [form.formState.errors.prompt_text] : undefined} />
+                <Textarea
+                  {...form.register("prompt_text")}
+                  rows={3}
+                  className="resize-none max-h-48 overflow-y-auto"
+                  placeholder="Optional project-level prompt"
+                />
+                <FieldError
+                  errors={form.formState.errors.prompt_text ? [form.formState.errors.prompt_text] : undefined}
+                />
+              </Field>
+              <Field>
+                <FieldLabel>Logo URL</FieldLabel>
+                <Input
+                  {...form.register("logo_url")}
+                  type="url"
+                  inputMode="url"
+                  placeholder="https://..."
+                />
+                <FieldError errors={form.formState.errors.logo_url ? [form.formState.errors.logo_url] : undefined} />
               </Field>
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setEditing(null)}>
